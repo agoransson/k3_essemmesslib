@@ -149,8 +149,8 @@ public class Essemmess {
 
 			/* Fire the http post and store the response */
 			response = httppost(url, arguments);
-			
-			//Log.i( "test", response );
+
+			// Log.i( "test", response );
 			return null;
 		}
 
@@ -177,12 +177,12 @@ public class Essemmess {
 					for (int i = 0; i < json_array.length(); ++i) {
 						JSONObject json_post = json_array.getJSONObject(i);
 
-						posts.add(new Post(json_post.getString("tag"), json_post
-								.getString("user"), json_post.getString("message")));
+						posts.add(new Post(json_post.getString("tag"), json_post.getString("user"),
+								json_post.getString("message")));
 					}
 
 					/* Dispatch the event with arraylist */
-					dispatchEvent(new EssemmessEvent(Essemmess.this, posts));
+					dispatchReadEvent(new EssemmessReadEvent(Essemmess.this, posts));
 					break;
 				}
 
@@ -258,13 +258,25 @@ public class Essemmess {
 	}
 
 	// This private class is used to fire MyEvents
-	void dispatchEvent(EssemmessEvent evt) {
+	void dispatchReadEvent(EssemmessReadEvent evt) {
 		Object[] listeners = listenerList.getListenerList();
 		// Each listener occupies two elements - the first is the listener class
 		// and the second is the listener instance
 		for (int i = 0; i < listeners.length; i += 2) {
 			if (listeners[i] == EssemmessListener.class) {
 				((EssemmessListener) listeners[i + 1]).NewEssemmessPosts(evt);
+			}
+		}
+	}
+
+	// This private class is used to fire MyEvents
+	void dispatchLoginEvent(EssemmessLoginEvent evt) {
+		Object[] listeners = listenerList.getListenerList();
+		// Each listener occupies two elements - the first is the listener class
+		// and the second is the listener instance
+		for (int i = 0; i < listeners.length; i += 2) {
+			if (listeners[i] == EssemmessListener.class) {
+				((EssemmessListener) listeners[i + 1]).NewEssemmessLogin(evt);
 			}
 		}
 	}

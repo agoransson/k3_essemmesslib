@@ -4,6 +4,7 @@ import java.util.EventListener;
 
 public interface EssemmessListener extends EventListener {
 
-	public void NewEssemmessPosts(EssemmessEvent evt);
+	public void NewEssemmessPosts(EssemmessReadEvent evt);
+	public void NewEssemmessLogin(EssemmessLoginEvent evt);
 
 }
