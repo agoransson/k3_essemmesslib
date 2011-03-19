@@ -37,6 +37,10 @@ public class Essemmess {
 	public void setContext(Context ctx) {
 		this.ctx = ctx;
 	}
+	
+	public String getToken(){
+		return access_token;
+	}
 
 	public void login(String username, String password) {
 		/* Execute the HttpWorker as LOGIN with the parameters */
@@ -154,7 +158,7 @@ public class Essemmess {
 			/* Fire the http post and store the response */
 			response = httppost(url, arguments);
 
-			// Log.i( "test", response );
+			Log.i( "test", response );
 			return null;
 		}
 
