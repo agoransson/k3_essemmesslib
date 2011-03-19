@@ -150,6 +150,7 @@ public class Essemmess {
 			/* Fire the http post and store the response */
 			response = httppost(url, arguments);
 			
+			//Log.i( "test", response );
 			return null;
 		}
 
@@ -176,8 +177,8 @@ public class Essemmess {
 					for (int i = 0; i < json_array.length(); ++i) {
 						JSONObject json_post = json_array.getJSONObject(i);
 
-						posts.add(new Post(json_post.getString("tag_id"), json_post
-								.getString("user_id"), json_post.getString("message")));
+						posts.add(new Post(json_post.getString("tag"), json_post
+								.getString("user"), json_post.getString("message")));
 					}
 
 					/* Dispatch the event with arraylist */

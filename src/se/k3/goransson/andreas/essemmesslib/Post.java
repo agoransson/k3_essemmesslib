@@ -14,6 +14,6 @@ public class Post {
 	}
 
 	public String toString() {
-		return message;
+		return "User: " + user + "  Tag: " + tag + "  Message: " + message;
 	}
 }
