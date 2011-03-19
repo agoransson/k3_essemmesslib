@@ -149,8 +149,7 @@ public class Essemmess {
 
 			/* Fire the http post and store the response */
 			response = httppost(url, arguments);
-
-			Log.i("test", response);
+			
 			return null;
 		}
 
