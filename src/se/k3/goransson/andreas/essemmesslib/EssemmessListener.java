@@ -6,5 +6,6 @@ public interface EssemmessListener extends EventListener {
 
 	public void NewEssemmessPosts(EssemmessReadEvent evt);
 	public void NewEssemmessLogin(EssemmessLoginEvent evt);
+	public void NewEssemmessPublish(EssemmessPublishEvent evt);
 
 }

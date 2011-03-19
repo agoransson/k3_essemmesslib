@@ -34,6 +34,10 @@ public class Essemmess {
 		this.ctx = ctx;
 	}
 
+	public void setContext(Context ctx) {
+		this.ctx = ctx;
+	}
+
 	public void login(String username, String password) {
 		/* Execute the HttpWorker as LOGIN with the parameters */
 		new HttpWorker(this.ctx, HttpWorker.LOGIN).execute(username, password);
@@ -164,9 +168,15 @@ public class Essemmess {
 				case LOGIN:
 					/* Store the access_token for future use */
 					access_token = json_data.getString("access_token");
+					if( access_token.length() == 32 )
+						dispatchLoginEvent(new EssemmessLoginEvent(Essemmess.this, true));
+					else
+						dispatchLoginEvent(new EssemmessLoginEvent(Essemmess.this, false));
 					break;
 				case POST:
-					/**/
+					/* See if we managed to post something... */
+					String msg = json_data.getString("message");
+					dispatchPublishEvent(new EssemmessPublishEvent(Essemmess.this, msg));
 					break;
 				case READ:
 					/* Read all posts from response into arraylist */
@@ -280,5 +290,15 @@ public class Essemmess {
 			}
 		}
 	}
-
+	// This private class is used to fire MyEvents
+	void dispatchPublishEvent(EssemmessPublishEvent evt) {
+		Object[] listeners = listenerList.getListenerList();
+		// Each listener occupies two elements - the first is the listener class
+		// and the second is the listener instance
+		for (int i = 0; i < listeners.length; i += 2) {
+			if (listeners[i] == EssemmessListener.class) {
+				((EssemmessListener) listeners[i + 1]).NewEssemmessPublish(evt);
+			}
+		}
+	}
 }
