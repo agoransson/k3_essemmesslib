@@ -30,40 +30,79 @@ public class Essemmess {
 	/* Stored access_token, acquired from server */
 	private String access_token;
 
+	/**
+	 * Create a new Essemmess instance, pass the current foreground context
+	 * otherwise the app might crash. Do not use "getApplicationContext()"!
+	 * 
+	 * @param ctx
+	 */
 	public Essemmess(Context ctx) {
 		this.ctx = ctx;
 	}
 
+	/**
+	 * Sets the current context of the Essemmess server, should be used if you
+	 * use the same server instance in multiple activies. Otherwise the
+	 * application will probably crash.
+	 * 
+	 * @param ctx
+	 */
 	public void setContext(Context ctx) {
 		this.ctx = ctx;
 	}
-	
-	public String getToken(){
+
+	/**
+	 * Returns the md5 access_token stored inside the server.
+	 * 
+	 * @return
+	 */
+	public String getToken() {
 		return access_token;
 	}
 
+	/**
+	 * Attempts to perform a login to the Essemmess server.
+	 * 
+	 * @param username
+	 * @param password
+	 */
 	public void login(String username, String password) {
 		/* Execute the HttpWorker as LOGIN with the parameters */
 		new HttpWorker(this.ctx, HttpWorker.LOGIN).execute(username, password);
 	}
 
+	/**
+	 * Attemtps to perform a message publish to the Essemmess server.
+	 * 
+	 * @param message
+	 * @param tag
+	 */
 	public void post(String message, String tag) {
 		/* Execute the HttpWorker as POST with the parameters */
-		new HttpWorker(this.ctx, HttpWorker.POST).execute(access_token, message, tag);
+		new HttpWorker(this.ctx, HttpWorker.PUBLISH).execute(access_token, message, tag);
 	}
 
+	/**
+	 * Unregisters the Essemmess server.
+	 */
 	public void logout() {
 		/* Execute the HttpWorker as LOGOUT with the parameters */
 		new HttpWorker(this.ctx, HttpWorker.LOGOUT).execute(access_token);
 	}
 
+	/**
+	 * Attempts to read messages published on the Essemmess server.
+	 * 
+	 * @param filter_tag
+	 */
 	public void read(String filter_tag) {
 		/* Execute the HttpWorker as READ with the parameters */
 		new HttpWorker(this.ctx, HttpWorker.READ).execute(access_token, filter_tag);
 	}
 
 	/**
-	 * Generic Worker, used to connect, and read responses from the server.
+	 * Generic Worker, used to connect to, and read responses from, the
+	 * Essemmess server.
 	 * 
 	 * @author andreas
 	 * 
@@ -78,7 +117,7 @@ public class Essemmess {
 
 		/* Action constants */
 		public static final int LOGIN = 10;
-		public static final int POST = 11;
+		public static final int PUBLISH = 11;
 		public static final int READ = 12;
 		public static final int LOGOUT = 13;
 
@@ -129,7 +168,7 @@ public class Essemmess {
 				arguments.add(new BasicNameValuePair("username", params[0]));
 				arguments.add(new BasicNameValuePair("password", params[1]));
 				break;
-			case POST:
+			case PUBLISH:
 				/* Set the url */
 				url = SERVER + "post.php";
 
@@ -158,7 +197,7 @@ public class Essemmess {
 			/* Fire the http post and store the response */
 			response = httppost(url, arguments);
 
-			Log.i( "test", response );
+			Log.i("test", response);
 			return null;
 		}
 
@@ -172,12 +211,12 @@ public class Essemmess {
 				case LOGIN:
 					/* Store the access_token for future use */
 					access_token = json_data.getString("access_token");
-					if( access_token.length() == 32 )
+					if (access_token.length() == 32)
 						dispatchLoginEvent(new EssemmessLoginEvent(Essemmess.this, true));
 					else
 						dispatchLoginEvent(new EssemmessLoginEvent(Essemmess.this, false));
 					break;
-				case POST:
+				case PUBLISH:
 					/* See if we managed to post something... */
 					String msg = json_data.getString("message");
 					dispatchPublishEvent(new EssemmessPublishEvent(Essemmess.this, msg));
@@ -259,19 +298,35 @@ public class Essemmess {
 	}
 
 	/* ===== EVENT OBJECTS ===== */
+	/**
+	 * List of event listeners.
+	 */
 	protected EventListenerList listenerList = new EventListenerList();
 
-	// This methods allows classes to register for MyEvents
+	/**
+	 * Add a new EssemmessListener to the list.
+	 * 
+	 * @param listener
+	 */
 	public void addEssemmessEventListener(EssemmessListener listener) {
 		listenerList.add(EssemmessListener.class, listener);
 	}
 
-	// This methods allows classes to unregister for MyEvents
+	/**
+	 * Remove the selected EssemmessListener from the list.
+	 * 
+	 * @param listener
+	 */
 	public void removeEssemmessEventListener(EssemmessListener listener) {
 		listenerList.remove(EssemmessListener.class, listener);
 	}
 
-	// This private class is used to fire MyEvents
+	/**
+	 * Dispatches a new READ event, this is dispatched when the HttpWorker has
+	 * executed a READ action on the Essemmess server.
+	 * 
+	 * @param evt
+	 */
 	void dispatchReadEvent(EssemmessReadEvent evt) {
 		Object[] listeners = listenerList.getListenerList();
 		// Each listener occupies two elements - the first is the listener class
@@ -283,7 +338,12 @@ public class Essemmess {
 		}
 	}
 
-	// This private class is used to fire MyEvents
+	/**
+	 * Dispatches a new LOGIN event, this is dispatched when the HttpWorker has
+	 * executed a LOGIN action on the Essemmess server.
+	 * 
+	 * @param evt
+	 */
 	void dispatchLoginEvent(EssemmessLoginEvent evt) {
 		Object[] listeners = listenerList.getListenerList();
 		// Each listener occupies two elements - the first is the listener class
@@ -294,7 +354,13 @@ public class Essemmess {
 			}
 		}
 	}
-	// This private class is used to fire MyEvents
+
+	/**
+	 * Dispatches a new PUBLISH event, this is dispatched when the HttpWorker
+	 * has executed a PUBLISH action on the Essemmess server.
+	 * 
+	 * @param evt
+	 */
 	void dispatchPublishEvent(EssemmessPublishEvent evt) {
 		Object[] listeners = listenerList.getListenerList();
 		// Each listener occupies two elements - the first is the listener class

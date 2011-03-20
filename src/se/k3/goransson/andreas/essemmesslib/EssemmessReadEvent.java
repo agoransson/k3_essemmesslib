@@ -13,6 +13,12 @@ public class EssemmessReadEvent extends EventObject {
 		this.posts = posts;
 	}
 
+	/**
+	 * Returns all messages on the server, which correspond to the selected
+	 * filter.
+	 * 
+	 * @return
+	 */
 	public ArrayList<Post> getPosts() {
 		return posts;
 	}

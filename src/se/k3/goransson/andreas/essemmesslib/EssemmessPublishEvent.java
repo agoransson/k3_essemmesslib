@@ -5,13 +5,18 @@ import java.util.EventObject;
 public class EssemmessPublishEvent extends EventObject {
 
 	private String returnmessage;
-	
-	public EssemmessPublishEvent(Essemmess source, String returnmessage ) {
+
+	public EssemmessPublishEvent(Essemmess source, String returnmessage) {
 		super(source);
 		this.returnmessage = returnmessage;
 	}
 
-	public String getMessage(){
+	/**
+	 * Get the status of the PUBLISH attempt.
+	 * 
+	 * @return
+	 */
+	public String getMessage() {
 		return returnmessage;
 	}
 }
