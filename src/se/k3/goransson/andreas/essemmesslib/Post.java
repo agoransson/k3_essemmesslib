@@ -19,6 +19,18 @@ public class Post {
 		this.message = message;
 	}
 
+	public String getTag() {
+		return tag;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
 	/**
 	 * Returns a string representation of the published message with all
 	 * information. User, Tag, and Message.
