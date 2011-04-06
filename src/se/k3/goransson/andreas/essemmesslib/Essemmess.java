@@ -113,7 +113,7 @@ public class Essemmess {
 		private static final String TAG = "HttpWorker";
 
 		/* Location of the server scripts */
-		private static final String SERVER = "http://195.178.228.96/pfi3/";
+		private static final String SERVER = "http://195.178.232.26:8080/pfi3_2011/";
 
 		/* Action constants */
 		public static final int LOGIN = 10;
