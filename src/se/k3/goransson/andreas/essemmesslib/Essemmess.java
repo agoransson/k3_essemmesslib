@@ -19,8 +19,10 @@ import org.json.JSONObject;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 public class Essemmess {
 
@@ -30,6 +32,9 @@ public class Essemmess {
 	/* Stored access_token, acquired from server */
 	private String access_token;
 
+	/* Connectivity manager - Internet connected? */
+	private ConnectivityManager mConnectivityManager;
+
 	/**
 	 * Create a new Essemmess instance, pass the current foreground context
 	 * otherwise the app might crash. Do not use "getApplicationContext()"!
@@ -38,6 +43,9 @@ public class Essemmess {
 	 */
 	public Essemmess(Context ctx) {
 		this.ctx = ctx;
+
+		mConnectivityManager = (ConnectivityManager) ctx
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
 	}
 
 	/**
@@ -67,8 +75,15 @@ public class Essemmess {
 	 * @param password
 	 */
 	public void login(String username, String password) {
-		/* Execute the HttpWorker as LOGIN with the parameters */
-		new HttpWorker(this.ctx, HttpWorker.LOGIN).execute(username, password);
+		if (mConnectivityManager.getActiveNetworkInfo().isConnectedOrConnecting()) {
+			/* Execute the HttpWorker as LOGIN with the parameters */
+			new HttpWorker(this.ctx, HttpWorker.LOGIN).execute(username, password);
+		} else {
+			/* Toast "not connected" */
+			Toast.makeText(ctx,
+					"No internet connection found when logging in to server.",
+					Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	/**
@@ -78,16 +93,30 @@ public class Essemmess {
 	 * @param tag
 	 */
 	public void post(String message, String tag) {
-		/* Execute the HttpWorker as POST with the parameters */
-		new HttpWorker(this.ctx, HttpWorker.PUBLISH).execute(access_token, message, tag);
+		if (mConnectivityManager.getActiveNetworkInfo().isConnectedOrConnecting()) {
+			/* Execute the HttpWorker as POST with the parameters */
+			new HttpWorker(this.ctx, HttpWorker.PUBLISH).execute(access_token, message,
+					tag);
+		} else {
+			/* Toast "not connected" */
+			Toast.makeText(ctx, "No internet connection found when posting to server.",
+					Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	/**
 	 * Unregisters the Essemmess server.
 	 */
 	public void logout() {
-		/* Execute the HttpWorker as LOGOUT with the parameters */
-		new HttpWorker(this.ctx, HttpWorker.LOGOUT).execute(access_token);
+		if (mConnectivityManager.getActiveNetworkInfo().isConnectedOrConnecting()) {
+			/* Execute the HttpWorker as LOGOUT with the parameters */
+			new HttpWorker(this.ctx, HttpWorker.LOGOUT).execute(access_token);
+		} else {
+			/* Toast "not connected" */
+			Toast.makeText(ctx,
+					"No internet connection found when logging out of server.",
+					Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	/**
@@ -96,8 +125,15 @@ public class Essemmess {
 	 * @param filter_tag
 	 */
 	public void read(String filter_tag) {
-		/* Execute the HttpWorker as READ with the parameters */
-		new HttpWorker(this.ctx, HttpWorker.READ).execute(access_token, filter_tag);
+		if (mConnectivityManager.getActiveNetworkInfo().isConnectedOrConnecting()) {
+			/* Execute the HttpWorker as READ with the parameters */
+			new HttpWorker(this.ctx, HttpWorker.READ).execute(access_token, filter_tag);
+		} else {
+			/* Toast "not connected" */
+			Toast.makeText(ctx,
+					"No internet connection found when reading messages on server.",
+					Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	/**
@@ -197,56 +233,68 @@ public class Essemmess {
 			/* Fire the http post and store the response */
 			response = httppost(url, arguments);
 
-			Log.i("test", response);
+			// Log.i("test", response);
 			return null;
 		}
 
 		@Override
 		protected void onPostExecute(Integer result) {
-			/* Parse the JSON msg */
-			try {
-				JSONObject json_data = new JSONObject(response);
+			/* Make sure the http response has some content */
+			if (response != null || response.length() > 0) {
+				/* Parse the JSON msg */
+				try {
+					JSONObject json_data = new JSONObject(response);
 
-				switch (action) {
-				case LOGIN:
-					/* Store the access_token for future use */
-					access_token = json_data.getString("access_token");
-					if (access_token.length() == 32)
-						dispatchLoginEvent(new EssemmessLoginEvent(Essemmess.this, true));
-					else
-						dispatchLoginEvent(new EssemmessLoginEvent(Essemmess.this, false));
-					break;
-				case PUBLISH:
-					/* See if we managed to post something... */
-					String msg = json_data.getString("message");
-					dispatchPublishEvent(new EssemmessPublishEvent(Essemmess.this, msg));
-					break;
-				case READ:
-					/* Read all posts from response into arraylist */
-					ArrayList<Post> posts = new ArrayList<Post>();
+					switch (action) {
+					case LOGIN:
+						/* Store the access_token for future use */
+						access_token = json_data.getString("access_token");
+						/* Dispatch event based on the access_token */
+						if (access_token.length() == 32)
+							dispatchLoginEvent(new EssemmessLoginEvent(Essemmess.this,
+									true));
+						else
+							dispatchLoginEvent(new EssemmessLoginEvent(Essemmess.this,
+									false));
+						break;
+					case PUBLISH:
+						/* See if we managed to post something... */
+						String msg = json_data.getString("message");
+						dispatchPublishEvent(new EssemmessPublishEvent(Essemmess.this,
+								msg));
+						break;
+					case READ:
+						/* Read all posts from response into arraylist */
+						ArrayList<Post> posts = new ArrayList<Post>();
 
-					JSONArray json_array = json_data.getJSONArray("posts");
+						JSONArray json_array = json_data.getJSONArray("posts");
 
-					for (int i = 0; i < json_array.length(); ++i) {
-						JSONObject json_post = json_array.getJSONObject(i);
+						for (int i = 0; i < json_array.length(); ++i) {
+							JSONObject json_post = json_array.getJSONObject(i);
 
-						posts.add(new Post(json_post.getString("tag"), json_post.getString("user"),
-								json_post.getString("message")));
+							posts.add(new Post(json_post.getString("tag"), json_post
+									.getString("user"), json_post.getString("message")));
+						}
+
+						/* Dispatch the event with arraylist */
+						dispatchReadEvent(new EssemmessReadEvent(Essemmess.this, posts));
+						break;
 					}
 
-					/* Dispatch the event with arraylist */
-					dispatchReadEvent(new EssemmessReadEvent(Essemmess.this, posts));
-					break;
+				} catch (JSONException e) {
+					Log.e(TAG, "Error parsing data " + e.toString());
 				}
 
-			} catch (JSONException e) {
-				Log.e(TAG, "Error parsing data " + e.toString());
+				/* We're done, shut the progress dialog off */
+				if (mProgressDialog != null)
+					mProgressDialog.dismiss();
+
+			} else {
+				/* HTTP Post failed... */
+				Toast.makeText(ctx, "Connection to server failed, please try again.",
+						Toast.LENGTH_SHORT).show();
+
 			}
-
-			/* We're done, shut the progress dialog off */
-			if (mProgressDialog != null)
-				mProgressDialog.dismiss();
-
 			super.onPostExecute(result);
 		}
 
@@ -276,8 +324,8 @@ public class Essemmess {
 			/* Read from server */
 			try {
 				/* Read the response stream */
-				BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"),
-						8);
+				BufferedReader reader = new BufferedReader(new InputStreamReader(is,
+						"iso-8859-1"), 8);
 
 				/* Copy the response to String */
 				StringBuilder sb = new StringBuilder();
