@@ -1,5 +1,26 @@
 package se.mah.k3.goransson.andreas.essemmesslib;
 
+/*
+ * Connects to, and interacts with, the messaging-system set up at 
+ * Malmö University. This library is part of the Android specific mobile 
+ * design courses at Arts and Communication.
+ * 
+ * Copyright (C) 2011  Andreas Göransson
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,6 +45,14 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
+/**
+ * Essemmess is a library used for communicating and interacting with the
+ * message service developed at Malmö University, and is used for educational
+ * purposes at the programming courses at Arts and Communication.
+ * 
+ * @author Andreas Göransson, andreas.goransson@mah.se
+ * 
+ */
 public class Essemmess {
 
 	/* Application context */
@@ -37,7 +66,8 @@ public class Essemmess {
 
 	/**
 	 * Create a new Essemmess instance, pass the current foreground context
-	 * otherwise the app might crash. Do not use "getApplicationContext()"!
+	 * otherwise the app might crash. Do not use "getApplicationContext()" if
+	 * you can avoid it.
 	 * 
 	 * @param ctx
 	 */
@@ -75,9 +105,11 @@ public class Essemmess {
 	 * @param password
 	 */
 	public void login(String username, String password) {
-		if (mConnectivityManager.getActiveNetworkInfo().isConnectedOrConnecting()) {
+		if (mConnectivityManager.getActiveNetworkInfo()
+				.isConnectedOrConnecting()) {
 			/* Execute the HttpWorker as LOGIN with the parameters */
-			new HttpWorker(this.ctx, HttpWorker.LOGIN).execute(username, password);
+			new HttpWorker(this.ctx, HttpWorker.LOGIN).execute(username,
+					password);
 		} else {
 			/* Toast "not connected" */
 			Toast.makeText(ctx,
@@ -93,22 +125,26 @@ public class Essemmess {
 	 * @param tag
 	 */
 	public void post(String message, String tag) {
-		if (mConnectivityManager.getActiveNetworkInfo().isConnectedOrConnecting()) {
+		if (mConnectivityManager.getActiveNetworkInfo()
+				.isConnectedOrConnecting()) {
 			/* Execute the HttpWorker as POST with the parameters */
-			new HttpWorker(this.ctx, HttpWorker.PUBLISH).execute(access_token, message,
-					tag);
+			new HttpWorker(this.ctx, HttpWorker.WRITE).execute(access_token,
+					message, tag);
 		} else {
 			/* Toast "not connected" */
-			Toast.makeText(ctx, "No internet connection found when posting to server.",
+			Toast.makeText(ctx,
+					"No internet connection found when posting to server.",
 					Toast.LENGTH_SHORT).show();
 		}
 	}
 
 	/**
-	 * Unregisters the Essemmess server.
+	 * Unregisters the Essemmess server, this should be called when the
+	 * application is destroyed.
 	 */
 	public void logout() {
-		if (mConnectivityManager.getActiveNetworkInfo().isConnectedOrConnecting()) {
+		if (mConnectivityManager.getActiveNetworkInfo()
+				.isConnectedOrConnecting()) {
 			/* Execute the HttpWorker as LOGOUT with the parameters */
 			new HttpWorker(this.ctx, HttpWorker.LOGOUT).execute(access_token);
 		} else {
@@ -125,12 +161,15 @@ public class Essemmess {
 	 * @param filter_tag
 	 */
 	public void read(String filter_tag) {
-		if (mConnectivityManager.getActiveNetworkInfo().isConnectedOrConnecting()) {
+		if (mConnectivityManager.getActiveNetworkInfo()
+				.isConnectedOrConnecting()) {
 			/* Execute the HttpWorker as READ with the parameters */
-			new HttpWorker(this.ctx, HttpWorker.READ).execute(access_token, filter_tag);
+			new HttpWorker(this.ctx, HttpWorker.READ).execute(access_token,
+					filter_tag);
 		} else {
 			/* Toast "not connected" */
-			Toast.makeText(ctx,
+			Toast.makeText(
+					ctx,
 					"No internet connection found when reading messages on server.",
 					Toast.LENGTH_SHORT).show();
 		}
@@ -141,7 +180,6 @@ public class Essemmess {
 	 * Essemmess server.
 	 * 
 	 * @author andreas
-	 * 
 	 */
 	private class HttpWorker extends AsyncTask<String, Integer, Integer> {
 
@@ -153,7 +191,7 @@ public class Essemmess {
 
 		/* Action constants */
 		public static final int LOGIN = 10;
-		public static final int PUBLISH = 11;
+		public static final int WRITE = 11;
 		public static final int READ = 12;
 		public static final int LOGOUT = 13;
 
@@ -204,12 +242,13 @@ public class Essemmess {
 				arguments.add(new BasicNameValuePair("username", params[0]));
 				arguments.add(new BasicNameValuePair("password", params[1]));
 				break;
-			case PUBLISH:
+			case WRITE:
 				/* Set the url */
 				url = SERVER + "post.php";
 
 				/* Parameters... */
-				arguments.add(new BasicNameValuePair("access_token", params[0]));
+				arguments
+						.add(new BasicNameValuePair("access_token", params[0]));
 				arguments.add(new BasicNameValuePair("message", params[1]));
 				arguments.add(new BasicNameValuePair("tag", params[2]));
 				break;
@@ -218,7 +257,8 @@ public class Essemmess {
 				url = SERVER + "read.php";
 
 				/* Parameters */
-				arguments.add(new BasicNameValuePair("access_token", params[0]));
+				arguments
+						.add(new BasicNameValuePair("access_token", params[0]));
 				arguments.add(new BasicNameValuePair("filter_tag", params[1]));
 				break;
 			case LOGOUT:
@@ -226,7 +266,8 @@ public class Essemmess {
 				url = SERVER + "logout.php";
 
 				/* Parameters... */
-				arguments.add(new BasicNameValuePair("access_token", params[0]));
+				arguments
+						.add(new BasicNameValuePair("access_token", params[0]));
 				break;
 			}
 
@@ -249,19 +290,22 @@ public class Essemmess {
 					case LOGIN:
 						/* Store the access_token for future use */
 						access_token = json_data.getString("access_token");
-						/* Dispatch event based on the access_token */
+
 						if (access_token.length() == 32)
-							dispatchLoginEvent(new EssemmessLoginEvent(Essemmess.this,
-									true));
+							dispatchLoginEvent(new EssemmessLoginEvent(
+									Essemmess.this, true));
 						else
-							dispatchLoginEvent(new EssemmessLoginEvent(Essemmess.this,
-									false));
+							dispatchLoginEvent(new EssemmessLoginEvent(
+									Essemmess.this, false));
+
 						break;
-					case PUBLISH:
+					case WRITE:
 						/* See if we managed to post something... */
 						String msg = json_data.getString("message");
-						dispatchPublishEvent(new EssemmessPublishEvent(Essemmess.this,
-								msg));
+
+						// This is deprecated, but will leave it in for now...
+						dispatchPublishEvent(new EssemmessWriteEvent(
+								Essemmess.this, msg));
 						break;
 					case READ:
 						/* Read all posts from response into arraylist */
@@ -272,12 +316,14 @@ public class Essemmess {
 						for (int i = 0; i < json_array.length(); ++i) {
 							JSONObject json_post = json_array.getJSONObject(i);
 
-							posts.add(new Post(json_post.getString("tag"), json_post
-									.getString("user"), json_post.getString("message")));
+							posts.add(new Post(json_post.getString("tag"),
+									json_post.getString("user"), json_post
+											.getString("message")));
 						}
 
 						/* Dispatch the event with arraylist */
-						dispatchReadEvent(new EssemmessReadEvent(Essemmess.this, posts));
+						dispatchReadEvent(new EssemmessReadEvent(
+								Essemmess.this, posts));
 						break;
 					}
 
@@ -291,7 +337,8 @@ public class Essemmess {
 
 			} else {
 				/* HTTP Post failed... */
-				Toast.makeText(ctx, "Connection to server failed, please try again.",
+				Toast.makeText(ctx,
+						"Connection to server failed, please try again.",
 						Toast.LENGTH_SHORT).show();
 
 			}
@@ -324,8 +371,8 @@ public class Essemmess {
 			/* Read from server */
 			try {
 				/* Read the response stream */
-				BufferedReader reader = new BufferedReader(new InputStreamReader(is,
-						"iso-8859-1"), 8);
+				BufferedReader reader = new BufferedReader(
+						new InputStreamReader(is, "iso-8859-1"), 8);
 
 				/* Copy the response to String */
 				StringBuilder sb = new StringBuilder();
@@ -375,13 +422,13 @@ public class Essemmess {
 	 * 
 	 * @param evt
 	 */
-	void dispatchReadEvent(EssemmessReadEvent evt) {
+	private void dispatchReadEvent(EssemmessReadEvent evt) {
 		Object[] listeners = listenerList.getListenerList();
 		// Each listener occupies two elements - the first is the listener class
 		// and the second is the listener instance
 		for (int i = 0; i < listeners.length; i += 2) {
 			if (listeners[i] == EssemmessListener.class) {
-				((EssemmessListener) listeners[i + 1]).NewEssemmessPosts(evt);
+				((EssemmessListener) listeners[i + 1]).essemmessRead(evt);
 			}
 		}
 	}
@@ -392,13 +439,13 @@ public class Essemmess {
 	 * 
 	 * @param evt
 	 */
-	void dispatchLoginEvent(EssemmessLoginEvent evt) {
+	private void dispatchLoginEvent(EssemmessLoginEvent evt) {
 		Object[] listeners = listenerList.getListenerList();
 		// Each listener occupies two elements - the first is the listener class
 		// and the second is the listener instance
 		for (int i = 0; i < listeners.length; i += 2) {
 			if (listeners[i] == EssemmessListener.class) {
-				((EssemmessListener) listeners[i + 1]).NewEssemmessLogin(evt);
+				((EssemmessListener) listeners[i + 1]).essemmessLogin(evt);
 			}
 		}
 	}
@@ -409,13 +456,13 @@ public class Essemmess {
 	 * 
 	 * @param evt
 	 */
-	void dispatchPublishEvent(EssemmessPublishEvent evt) {
+	private void dispatchPublishEvent(EssemmessWriteEvent evt) {
 		Object[] listeners = listenerList.getListenerList();
 		// Each listener occupies two elements - the first is the listener class
 		// and the second is the listener instance
 		for (int i = 0; i < listeners.length; i += 2) {
 			if (listeners[i] == EssemmessListener.class) {
-				((EssemmessListener) listeners[i + 1]).NewEssemmessPublish(evt);
+				((EssemmessListener) listeners[i + 1]).essemmessWrite(evt);
 			}
 		}
 	}

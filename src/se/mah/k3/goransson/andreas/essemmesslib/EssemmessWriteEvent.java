@@ -21,41 +21,28 @@ package se.mah.k3.goransson.andreas.essemmesslib;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.EventObject;
+
 /**
- * A representation of a message-object.
  * 
- * @author Andreas Göransson
+ * @author Andreas Göransson, andreas.goransson@mah.se
+ * 
  */
-public class Post {
+public class EssemmessWriteEvent extends EventObject {
 
-	public String tag;
-	public String user;
-	public String message;
+	private String returnmessage;
 
-	public Post(String tag, String user, String message) {
-		super();
-		this.tag = tag;
-		this.user = user;
-		this.message = message;
-	}
-
-	public String getTag() {
-		return tag;
-	}
-
-	public String getUser() {
-		return user;
-	}
-
-	public String getMessage() {
-		return message;
+	public EssemmessWriteEvent(Essemmess source, String returnmessage) {
+		super(source);
+		this.returnmessage = returnmessage;
 	}
 
 	/**
-	 * Returns a string representation of the published message with all
-	 * information. User, Tag, and Message.
+	 * Get the status of the PUBLISH attempt.
+	 * 
+	 * @return
 	 */
-	public String toString() {
-		return "User: " + user + "  Tag: " + tag + "  Message: " + message;
+	public String getMessage() {
+		return returnmessage;
 	}
 }
