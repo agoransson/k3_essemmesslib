@@ -29,6 +29,6 @@ TODO:
 
 
 Example app, functionality:
-To get the android example app up and running click "File" -> "General" -> "Existing Projects into Workspace".
+To get the android example app up and running click "File" -> "Import" -> "General" -> "Existing Projects into Workspace".
 * Login
 * Write
