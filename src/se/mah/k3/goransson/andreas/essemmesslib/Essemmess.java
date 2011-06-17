@@ -124,7 +124,7 @@ public class Essemmess {
 	 * @param message
 	 * @param tag
 	 */
-	public void post(String message, String tag) {
+	public void write(String message, String tag) {
 		if (mConnectivityManager.getActiveNetworkInfo()
 				.isConnectedOrConnecting()) {
 			/* Execute the HttpWorker as POST with the parameters */
