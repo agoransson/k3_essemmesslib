@@ -26,3 +26,10 @@ Supported functionality:
 TODO:
 * Register new user
 * Remove the listener interface, replace with Handler
+
+
+Example app, functionality:
+To get the android example app up and running, create a new Android project and select "Create from 
+existing source", then navigate to the folder inside the "android_example" folder.
+* Login
+* Write
