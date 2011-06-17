@@ -1,4 +1,4 @@
-package se.k3.goransson.andreas.essemmesslib;
+package se.mah.k3.goransson.andreas.essemmesslib;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

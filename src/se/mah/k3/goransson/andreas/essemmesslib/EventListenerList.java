@@ -1,4 +1,4 @@
-package se.k3.goransson.andreas.essemmesslib;
+package se.mah.k3.goransson.andreas.essemmesslib;
 
 /*
  * @(#) EventListenerList.java 1.6 - last change made 03/16/99

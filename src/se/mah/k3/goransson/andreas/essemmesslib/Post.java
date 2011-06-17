@@ -1,4 +1,4 @@
-package se.k3.goransson.andreas.essemmesslib;
+package se.mah.k3.goransson.andreas.essemmesslib;
 
 /**
  * A representation of a message published on the Essemmess server.
