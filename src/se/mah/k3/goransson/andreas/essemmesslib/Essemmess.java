@@ -1,6 +1,8 @@
 package se.mah.k3.goransson.andreas.essemmesslib;
 
 /*
+ * Essemmess.java
+ * 
  * Connects to, and interacts with, the messaging-system set up at 
  * Malmö University. This library is part of the Android specific mobile 
  * design courses at Arts and Communication.
@@ -179,7 +181,7 @@ public class Essemmess {
 	 * Generic Worker, used to connect to, and read responses from, the
 	 * Essemmess server.
 	 * 
-	 * @author andreas
+	 * @author Andreas Göransson, andreas.goransson@mah.se
 	 */
 	private class HttpWorker extends AsyncTask<String, Integer, Integer> {
 

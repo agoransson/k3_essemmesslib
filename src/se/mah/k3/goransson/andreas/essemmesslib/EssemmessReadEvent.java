@@ -1,6 +1,8 @@
 package se.mah.k3.goransson.andreas.essemmesslib;
 
 /*
+ * EssemmessReadEvent.java
+ * 
  * Connects to, and interacts with, the messaging-system set up at 
  * Malmö University. This library is part of the Android specific mobile 
  * design courses at Arts and Communication.
