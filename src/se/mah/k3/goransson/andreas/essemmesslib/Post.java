@@ -30,11 +30,11 @@ package se.mah.k3.goransson.andreas.essemmesslib;
  */
 public class Post {
 
+	public User user;
 	public String tag;
-	public String user;
 	public String message;
 
-	public Post(String tag, String user, String message) {
+	public Post(String tag, User user, String message) {
 		super();
 		this.tag = tag;
 		this.user = user;
@@ -45,7 +45,7 @@ public class Post {
 		return tag;
 	}
 
-	public String getUser() {
+	public User getUser() {
 		return user;
 	}
 
@@ -58,6 +58,6 @@ public class Post {
 	 * information. User, Tag, and Message.
 	 */
 	public String toString() {
-		return "User: " + user + "  Tag: " + tag + "  Message: " + message;
+		return "User: " + user.toString() + "  Tag: " + tag + "  Message: " + message;
 	}
 }

@@ -24,6 +24,7 @@ package se.mah.k3.goransson.andreas.essemmesslib;
  */
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.MultihomePlainSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
@@ -42,8 +44,13 @@ import org.json.JSONObject;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -98,6 +105,38 @@ public class Essemmess {
 	 */
 	public String getToken() {
 		return access_token;
+	}
+
+	/**
+	 * Registers a new user in the database.
+	 * 
+	 * @param username
+	 * @param password
+	 * @param email
+	 * @param avatar
+	 */
+	public void register(String username, String password, String email,
+			Bitmap avatar) {
+		if (mConnectivityManager.getActiveNetworkInfo().isConnected()) {
+			/* Make sure the avatar exists */
+			if (avatar != null) {
+				/* Get the image as string */
+				ByteArrayOutputStream stream = new ByteArrayOutputStream();
+				/* We want to keep a standard size for all avatars, 72x72px */
+				getScaledBitmap(avatar, 72).compress(
+						Bitmap.CompressFormat.JPEG, 75, stream);
+				byte[] byte_arr = stream.toByteArray();
+				String image_str = Base64.encodeToString(byte_arr,
+						Base64.DEFAULT);
+
+				/* Execute the HttpWorker as REGISTER with the parameters */
+				new HttpWorker(this.ctx, HttpWorker.REGISTER).execute(username,
+						password, email, image_str);
+			} else {
+				Toast.makeText(this.ctx, "Image capture failed, try again",
+						Toast.LENGTH_SHORT).show();
+			}
+		}
 	}
 
 	/**
@@ -178,12 +217,37 @@ public class Essemmess {
 	}
 
 	/**
+	 * Resizes the bitmap to a smaller, squared, version.
+	 * 
+	 * @param bmp
+	 * @return
+	 */
+	private Bitmap getScaledBitmap(Bitmap bmp, int size) {
+		int width = bmp.getWidth();
+		int height = bmp.getHeight();
+
+		/* Get the scale */
+		float scale_w = ((float) size) / width;
+		float scale_h = ((float) size) / height;
+
+		/* Transformation matrix */
+		Matrix matrix = new Matrix();
+		matrix.postScale(scale_w, scale_h);
+
+		/* Get the new bitmap */
+		Bitmap resized = Bitmap.createBitmap(bmp, 0, 0, width, height, matrix,
+				true);
+
+		return resized;
+	}
+
+	/**
 	 * Generic Worker, used to connect to, and read responses from, the
 	 * Essemmess server.
 	 * 
 	 * @author Andreas Göransson, andreas.goransson@mah.se
 	 */
-	private class HttpWorker extends AsyncTask<String, Integer, Integer> {
+	private class HttpWorker extends AsyncTask<String, Void, Void> {
 
 		/* TAG */
 		private static final String TAG = "HttpWorker";
@@ -196,6 +260,7 @@ public class Essemmess {
 		public static final int WRITE = 11;
 		public static final int READ = 12;
 		public static final int LOGOUT = 13;
+		public static final int REGISTER = 14;
 
 		/* Selected action */
 		private int action;
@@ -226,7 +291,7 @@ public class Essemmess {
 		}
 
 		@Override
-		protected Integer doInBackground(String... params) {
+		protected Void doInBackground(String... params) {
 
 			/* Server url */
 			String url = null;
@@ -271,22 +336,33 @@ public class Essemmess {
 				arguments
 						.add(new BasicNameValuePair("access_token", params[0]));
 				break;
+			case REGISTER:
+				/* Set the url */
+				url = SERVER + "register.php";
+
+				/* Parameters... */
+				arguments.add(new BasicNameValuePair("username", params[0]));
+				arguments.add(new BasicNameValuePair("password", params[1]));
+				arguments.add(new BasicNameValuePair("email", params[2]));
+				arguments.add(new BasicNameValuePair("avatar", params[3]));
+				break;
 			}
 
 			/* Fire the http post and store the response */
 			response = httppost(url, arguments);
 
-			// Log.i("test", response);
+			Log.i("test", response);
 			return null;
 		}
 
 		@Override
-		protected void onPostExecute(Integer result) {
+		protected void onPostExecute(Void result) {
 			/* Make sure the http response has some content */
 			if (response != null || response.length() > 0) {
 				/* Parse the JSON msg */
 				try {
 					JSONObject json_data = new JSONObject(response);
+					String message = null;
 
 					switch (action) {
 					case LOGIN:
@@ -294,20 +370,20 @@ public class Essemmess {
 						access_token = json_data.getString("access_token");
 
 						if (access_token.length() == 32)
-							dispatchLoginEvent(new EssemmessLoginEvent(
+							dispatchEssemmessEvent(new EssemmessLoginEvent(
 									Essemmess.this, true));
 						else
-							dispatchLoginEvent(new EssemmessLoginEvent(
+							dispatchEssemmessEvent(new EssemmessLoginEvent(
 									Essemmess.this, false));
 
 						break;
 					case WRITE:
 						/* See if we managed to post something... */
-						String msg = json_data.getString("message");
+						message = json_data.getString("message");
 
 						// This is deprecated, but will leave it in for now...
-						dispatchPublishEvent(new EssemmessWriteEvent(
-								Essemmess.this, msg));
+						dispatchEssemmessEvent(new EssemmessWriteEvent(
+								Essemmess.this, message));
 						break;
 					case READ:
 						/* Read all posts from response into arraylist */
@@ -318,14 +394,35 @@ public class Essemmess {
 						for (int i = 0; i < json_array.length(); ++i) {
 							JSONObject json_post = json_array.getJSONObject(i);
 
-							posts.add(new Post(json_post.getString("tag"),
-									json_post.getString("user"), json_post
-											.getString("message")));
+							JSONObject json_user = json_post
+									.getJSONObject("user");
+							/* Decode the bitmap */
+							byte[] raw_image = Base64.decode(
+									json_user.getString("avatar"),
+									Base64.DEFAULT);
+							Bitmap avatar = BitmapFactory.decodeByteArray(
+									raw_image, 0, raw_image.length);
+
+							/* Create the user */
+							User u = new User(json_user.getString("username"),
+									json_user.getString("email"), avatar);
+
+							/* Add the post to the list */
+							posts.add(new Post(json_post.getString("tag"), u,
+									json_post.getString("message")));
 						}
 
 						/* Dispatch the event with arraylist */
-						dispatchReadEvent(new EssemmessReadEvent(
+						dispatchEssemmessEvent(new EssemmessReadEvent(
 								Essemmess.this, posts));
+						break;
+					case REGISTER:
+						/* See if we managed to register... */
+						message = json_data.getString("message");
+
+						// This is deprecated, but will leave it in for now...
+						dispatchEssemmessEvent(new EssemmessRegisterEvent(
+								Essemmess.this, message));
 						break;
 					}
 
@@ -359,7 +456,7 @@ public class Essemmess {
 				HttpClient httpclient = new DefaultHttpClient();
 				HttpPost httppost = new HttpPost(url);
 
-				/* Add the login information "POST" variables in the php */
+				/* Add the "POST" variables in the php */
 				httppost.setEntity(new UrlEncodedFormEntity(args));
 
 				/* Execute the http POST and get the response */
@@ -419,52 +516,31 @@ public class Essemmess {
 	}
 
 	/**
-	 * Dispatches a new READ event, this is dispatched when the HttpWorker has
-	 * executed a READ action on the Essemmess server.
-	 * 
-	 * @param evt
-	 */
-	private void dispatchReadEvent(EssemmessReadEvent evt) {
-		Object[] listeners = listenerList.getListenerList();
-		// Each listener occupies two elements - the first is the listener class
-		// and the second is the listener instance
-		for (int i = 0; i < listeners.length; i += 2) {
-			if (listeners[i] == EssemmessListener.class) {
-				((EssemmessListener) listeners[i + 1]).essemmessRead(evt);
-			}
-		}
-	}
-
-	/**
-	 * Dispatches a new LOGIN event, this is dispatched when the HttpWorker has
-	 * executed a LOGIN action on the Essemmess server.
-	 * 
-	 * @param evt
-	 */
-	private void dispatchLoginEvent(EssemmessLoginEvent evt) {
-		Object[] listeners = listenerList.getListenerList();
-		// Each listener occupies two elements - the first is the listener class
-		// and the second is the listener instance
-		for (int i = 0; i < listeners.length; i += 2) {
-			if (listeners[i] == EssemmessListener.class) {
-				((EssemmessListener) listeners[i + 1]).essemmessLogin(evt);
-			}
-		}
-	}
-
-	/**
 	 * Dispatches a new PUBLISH event, this is dispatched when the HttpWorker
 	 * has executed a PUBLISH action on the Essemmess server.
 	 * 
 	 * @param evt
 	 */
-	private void dispatchPublishEvent(EssemmessWriteEvent evt) {
+	private void dispatchEssemmessEvent(EssemmessEvent evt) {
 		Object[] listeners = listenerList.getListenerList();
 		// Each listener occupies two elements - the first is the listener class
 		// and the second is the listener instance
 		for (int i = 0; i < listeners.length; i += 2) {
 			if (listeners[i] == EssemmessListener.class) {
-				((EssemmessListener) listeners[i + 1]).essemmessWrite(evt);
+				/* Fire the correct event type */
+				if (evt.getEventType() == EssemmessEvent.LOGIN)
+					((EssemmessListener) listeners[i + 1])
+							.essemmessLogin((EssemmessLoginEvent) evt);
+				else if (evt.getEventType() == EssemmessEvent.READ)
+					((EssemmessListener) listeners[i + 1])
+							.essemmessRead((EssemmessReadEvent) evt);
+				else if (evt.getEventType() == EssemmessEvent.WRITE)
+					((EssemmessListener) listeners[i + 1])
+							.essemmessWrite((EssemmessWriteEvent) evt);
+				else if (evt.getEventType() == EssemmessEvent.REGISTER)
+					((EssemmessListener) listeners[i + 1])
+							.essemmessRegister((EssemmessRegisterEvent) evt);
+
 			}
 		}
 	}

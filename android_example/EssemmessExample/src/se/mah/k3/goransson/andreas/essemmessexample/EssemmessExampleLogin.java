@@ -5,21 +5,33 @@ import se.mah.k3.goransson.andreas.essemmesslib.EssemmessHelper;
 import se.mah.k3.goransson.andreas.essemmesslib.EssemmessListener;
 import se.mah.k3.goransson.andreas.essemmesslib.EssemmessLoginEvent;
 import se.mah.k3.goransson.andreas.essemmesslib.EssemmessReadEvent;
+import se.mah.k3.goransson.andreas.essemmesslib.EssemmessRegisterEvent;
 import se.mah.k3.goransson.andreas.essemmesslib.EssemmessWriteEvent;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 /*
  * Make sure to implement the "EssemmessListener" interface!
  */
 public class EssemmessExampleLogin extends Activity implements
-		EssemmessListener {
+		EssemmessListener, OnClickListener {
+
+	private static final String TAG = "EssemmessExampleLogin";
 
 	/* Create the Essemmess server obj */
 	private Essemmess mServer;
@@ -41,18 +53,11 @@ public class EssemmessExampleLogin extends Activity implements
 		username = (EditText) findViewById(R.id.text_username);
 		password = (EditText) findViewById(R.id.text_password);
 		Button login = (Button) findViewById(R.id.button_login);
-		login.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				mServer.login(username.getText().toString(), password.getText()
-						.toString());
-			}
-		});
+		login.setOnClickListener(this);
 	}
 
 	@Override
-	protected void onPause() {
+	protected void onStop() {
 		/* Remove this activity from the list of listeners */
 		mServer.removeEssemmessEventListener(this);
 
@@ -68,8 +73,34 @@ public class EssemmessExampleLogin extends Activity implements
 	}
 
 	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		/* Create a new menu from the xml file "mymenu.xml" */
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.mymenu, menu);
+
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+		case R.id.register_user:
+			/* Dialog to register user, will return something */
+			Intent new_user = new Intent(EssemmessExampleLogin.this,
+					EssemmessExampleRegister.class);
+			startActivityForResult(new_user,
+					EssemmessExampleRegister.REGISTER_USER);
+
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+
+	}
+
+	@Override
 	public void essemmessRead(EssemmessReadEvent evt) {
-		/* We won't use the read event in this login-activity */
 	}
 
 	@Override
@@ -91,7 +122,34 @@ public class EssemmessExampleLogin extends Activity implements
 
 	@Override
 	public void essemmessWrite(EssemmessWriteEvent evt) {
-		/* We won't use this write event in the login activity */
+	}
+
+	@Override
+	public void essemmessRegister(EssemmessRegisterEvent evt) {
+	}
+
+	@Override
+	public void onClick(View v) {
+		if (v.getId() == R.id.button_login) {
+			mServer.login(username.getText().toString(), password.getText()
+					.toString());
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+		switch (requestCode) {
+		case EssemmessExampleRegister.REGISTER_USER:
+			String username = data.getStringExtra("username");
+			String password = data.getStringExtra("password");
+			String email = data.getStringExtra("email");
+			Bitmap avatar = data.getParcelableExtra("avatar");
+			mServer.register(username, password, email, avatar);
+			break;
+		}
+
+		super.onActivityResult(requestCode, resultCode, data);
 	}
 
 }

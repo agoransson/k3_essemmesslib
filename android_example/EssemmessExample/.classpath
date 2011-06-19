@@ -4,5 +4,6 @@
 	<classpathentry kind="src" path="pfi3_essemmesslib_src"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="src" path="k3_essemmesslib_src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

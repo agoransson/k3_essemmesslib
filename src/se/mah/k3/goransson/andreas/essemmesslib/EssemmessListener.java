@@ -54,4 +54,11 @@ public interface EssemmessListener extends EventListener {
 	 * @param evt
 	 */
 	public void essemmessWrite(EssemmessWriteEvent evt);
+
+	/**
+	 * Executed when a REGISTER event has been dispatched.
+	 * 
+	 * @param evt
+	 */
+	public void essemmessRegister(EssemmessRegisterEvent evt);
 }
