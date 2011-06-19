@@ -9,7 +9,7 @@ Arts and Communication, K3.
 
 The system is built on a simple PHP service which interacts with a MySQL database, the database
 contains a set of messages written by any of the registered users. Each message contains a
-message body, a message tag and the authors name.
+message body, a message tag and the author information (name, email, avatar).
 
 Your Android app can easily interact with this system by instantiating a server object, this object
 will allow your application to communicate TO the server. To react to the response of the server, your
