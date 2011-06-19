@@ -23,8 +23,6 @@ package se.mah.k3.goransson.andreas.essemmesslib;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.EventObject;
-
 /**
  * This is the login event object.
  * 
@@ -33,9 +31,10 @@ import java.util.EventObject;
 public class EssemmessLoginEvent extends EssemmessEvent {
 	private Boolean loggedin;
 
-	public EssemmessLoginEvent(Essemmess source, Boolean logedin) {
-		super(source, EssemmessEvent.LOGIN);
-		this.loggedin = logedin;
+	public EssemmessLoginEvent(Essemmess source, String json_message,
+			boolean loggedin) {
+		super(source, EssemmessEvent.LOGIN, json_message);
+		this.loggedin = loggedin;
 	}
 
 	/**
@@ -43,7 +42,7 @@ public class EssemmessLoginEvent extends EssemmessEvent {
 	 * 
 	 * @return
 	 */
-	public Boolean getLoggedin() {
+	public Boolean getLoggedIn() {
 		return loggedin;
 	}
 

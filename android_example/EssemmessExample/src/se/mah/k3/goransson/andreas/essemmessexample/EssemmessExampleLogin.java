@@ -8,12 +8,10 @@ import se.mah.k3.goransson.andreas.essemmesslib.EssemmessReadEvent;
 import se.mah.k3.goransson.andreas.essemmesslib.EssemmessRegisterEvent;
 import se.mah.k3.goransson.andreas.essemmesslib.EssemmessWriteEvent;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,8 +19,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 /*
@@ -106,7 +102,7 @@ public class EssemmessExampleLogin extends Activity implements
 	@Override
 	public void essemmessLogin(EssemmessLoginEvent evt) {
 		/* If we successfully log in to the server, start the next activity */
-		if (evt.getLoggedin()) {
+		if (evt.getLoggedIn()) {
 			/* Create the intent to start the "write" activity */
 			Intent nextActivity = new Intent(EssemmessExampleLogin.this,
 					EssemmessExampleWrite.class);
@@ -126,6 +122,14 @@ public class EssemmessExampleLogin extends Activity implements
 
 	@Override
 	public void essemmessRegister(EssemmessRegisterEvent evt) {
+		if (evt.getResult())
+			Toast.makeText(this, "User registered successfully",
+					Toast.LENGTH_SHORT).show();
+		else
+			Toast.makeText(
+					this,
+					"User registration failed with message " + evt.getMessage(),
+					Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
@@ -138,7 +142,6 @@ public class EssemmessExampleLogin extends Activity implements
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
 		switch (requestCode) {
 		case EssemmessExampleRegister.REGISTER_USER:
 			String username = data.getStringExtra("username");

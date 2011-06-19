@@ -24,7 +24,6 @@ package se.mah.k3.goransson.andreas.essemmesslib;
  */
 
 import java.util.ArrayList;
-import java.util.EventObject;
 
 /**
  * 
@@ -34,11 +33,38 @@ import java.util.EventObject;
 public class EssemmessReadEvent extends EssemmessEvent {
 
 	private ArrayList<Post> posts;
+	private boolean result = true;
 
-	public EssemmessReadEvent(Essemmess source, ArrayList<Post> posts) {
-		super(source, EssemmessEvent.READ);
+	/**
+	 * Failed to read the posts for some reason.
+	 * 
+	 * @param source
+	 * @param json_message
+	 * @param result
+	 */
+	public EssemmessReadEvent(Essemmess source, String json_message,
+			boolean result) {
+		this(source, json_message, null);
 
-		this.posts = posts;
+		this.result = result;
+	}
+
+	/**
+	 * Standard constructor, makes sure to have a non-null list. Even if the
+	 * list is contains zero items.
+	 * 
+	 * @param source
+	 * @param json_message
+	 * @param posts
+	 */
+	public EssemmessReadEvent(Essemmess source, String json_message,
+			ArrayList<Post> posts) {
+		super(source, EssemmessEvent.READ, json_message);
+
+		if (posts == null)
+			posts = new ArrayList<Post>();
+		else
+			this.posts = posts;
 	}
 
 	/**

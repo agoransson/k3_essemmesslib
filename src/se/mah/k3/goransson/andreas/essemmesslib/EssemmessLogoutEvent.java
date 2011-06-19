@@ -1,7 +1,7 @@
 package se.mah.k3.goransson.andreas.essemmesslib;
 
 /*
- * EssemmessWriteEvent.java
+ * EssemmessLoginEvent.java
  * 
  * Connects to, and interacts with, the messaging-system set up at 
  * Malmö University. This library is part of the Android specific mobile 
@@ -23,24 +23,13 @@ package se.mah.k3.goransson.andreas.essemmesslib;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
- * 
  * @author Andreas Göransson, andreas.goransson@mah.se
- * 
  */
-public class EssemmessWriteEvent extends EssemmessEvent {
+public class EssemmessLogoutEvent extends EssemmessEvent {
 
-	/* The status of the write-attempt */
-	private boolean result = false;
-
-	public EssemmessWriteEvent(Essemmess source, String json_message,
-			boolean result) {
-		super(source, EssemmessEvent.WRITE, json_message);
-		this.result = result;
+	public EssemmessLogoutEvent(Essemmess source, String json_message) {
+		super(source, EssemmessEvent.LOGOUT, json_message);
 	}
 
-	public boolean getResult() {
-		return result;
-	}
 }

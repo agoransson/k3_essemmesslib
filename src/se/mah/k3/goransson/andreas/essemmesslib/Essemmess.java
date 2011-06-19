@@ -35,7 +35,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.MultihomePlainSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
@@ -47,7 +46,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.util.Base64;
@@ -72,6 +70,9 @@ public class Essemmess {
 
 	/* Connectivity manager - Internet connected? */
 	private ConnectivityManager mConnectivityManager;
+
+	/* Enable debugg messages */
+	private boolean DEBUG = true;
 
 	/**
 	 * Create a new Essemmess instance, pass the current foreground context
@@ -105,6 +106,10 @@ public class Essemmess {
 	 */
 	public String getToken() {
 		return access_token;
+	}
+
+	public boolean isLoggedIn() {
+		return (access_token.length() == 32 ? true : false);
 	}
 
 	/**
@@ -351,7 +356,9 @@ public class Essemmess {
 			/* Fire the http post and store the response */
 			response = httppost(url, arguments);
 
-			Log.i("test", response);
+			if (DEBUG)
+				Log.i("test", response);
+
 			return null;
 		}
 
@@ -362,35 +369,61 @@ public class Essemmess {
 				/* Parse the JSON msg */
 				try {
 					JSONObject json_data = new JSONObject(response);
-					String message = null;
+
+					/* Get the json message */
+					String message = json_data.getString("message");
+
+					/* We load the message body elsewhere because it changes */
+					String data;
 
 					switch (action) {
 					case LOGIN:
 						/* Store the access_token for future use */
 						access_token = json_data.getString("access_token");
 
-						if (access_token.length() == 32)
-							dispatchEssemmessEvent(new EssemmessLoginEvent(
-									Essemmess.this, true));
-						else
-							dispatchEssemmessEvent(new EssemmessLoginEvent(
-									Essemmess.this, false));
+						/* Get the result */
+						data = json_data.getString("data");
+
+						/* Dispatch the login event */
+						dispatchEssemmessEvent(new EssemmessLoginEvent(
+								Essemmess.this, message,
+								Boolean.parseBoolean(data)));
 
 						break;
-					case WRITE:
-						/* See if we managed to post something... */
-						message = json_data.getString("message");
+					case LOGOUT:
+						/* Just reset the access_token */
+						access_token = "";
 
-						// This is deprecated, but will leave it in for now...
-						dispatchEssemmessEvent(new EssemmessWriteEvent(
+						/* Dispatch the logout event (there's no data in it...) */
+						dispatchEssemmessEvent(new EssemmessLogoutEvent(
 								Essemmess.this, message));
+						break;
+					case WRITE:
+						/* Get the result */
+						data = json_data.getString("data");
+
+						/* Dispatch the write event */
+						if (Boolean.parseBoolean(data))
+							dispatchEssemmessEvent(new EssemmessWriteEvent(
+									Essemmess.this, message, true));
+						else
+							dispatchEssemmessEvent(new EssemmessWriteEvent(
+									Essemmess.this, message, false));
+
 						break;
 					case READ:
 						/* Read all posts from response into arraylist */
 						ArrayList<Post> posts = new ArrayList<Post>();
 
-						JSONArray json_array = json_data.getJSONArray("posts");
+						/* First test if the read failed! */
+						if (!Boolean.parseBoolean(json_data.getString("data"))) {
+							/* Dispatch the event with arraylist */
+							dispatchEssemmessEvent(new EssemmessReadEvent(
+									Essemmess.this, message, posts));
+							break;
+						}
 
+						JSONArray json_array = json_data.getJSONArray("data");
 						for (int i = 0; i < json_array.length(); ++i) {
 							JSONObject json_post = json_array.getJSONObject(i);
 
@@ -414,15 +447,20 @@ public class Essemmess {
 
 						/* Dispatch the event with arraylist */
 						dispatchEssemmessEvent(new EssemmessReadEvent(
-								Essemmess.this, posts));
+								Essemmess.this, message, posts));
 						break;
 					case REGISTER:
-						/* See if we managed to register... */
-						message = json_data.getString("message");
+						/* Get the result */
+						data = json_data.getString("data");
 
-						// This is deprecated, but will leave it in for now...
-						dispatchEssemmessEvent(new EssemmessRegisterEvent(
-								Essemmess.this, message));
+						/* Dispatch the register event */
+						if (Boolean.parseBoolean(data)) {
+							dispatchEssemmessEvent(new EssemmessRegisterEvent(
+									Essemmess.this, message, true));
+						} else {
+							dispatchEssemmessEvent(new EssemmessRegisterEvent(
+									Essemmess.this, message, false));
+						}
 						break;
 					}
 

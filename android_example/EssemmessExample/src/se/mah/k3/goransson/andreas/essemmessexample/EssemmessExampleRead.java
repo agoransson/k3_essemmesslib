@@ -22,16 +22,17 @@ import android.widget.ListView;
 public class EssemmessExampleRead extends Activity implements EssemmessListener {
 
 	private static final String TAG = "EssemmessExampleRead";
+
+	/* Create the Essemmess server obj */
+	private Essemmess mServer;
+
 	/* UI */
-	/* Header (filter) */
 	private EditText filtertext;
 	private Button filterbutton;
-	/* Content (list) */
+
 	private ListView list;
 	private ArrayList<Post> messages;
 	private CustomListAdapter adapter;
-
-	private Essemmess mServer;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -42,7 +43,6 @@ public class EssemmessExampleRead extends Activity implements EssemmessListener 
 		mServer = EssemmessHelper.getServer(this);
 
 		/* UI */
-		/* Header (filter UI ) */
 		filtertext = (EditText) findViewById(R.id.read_filter);
 		filterbutton = (Button) findViewById(R.id.read_update);
 		filterbutton.setOnClickListener(new OnClickListener() {
@@ -51,7 +51,7 @@ public class EssemmessExampleRead extends Activity implements EssemmessListener 
 				mServer.read(filtertext.getText().toString());
 			}
 		});
-		/* Content (list) */
+
 		list = (ListView) findViewById(R.id.read_messages);
 		messages = new ArrayList<Post>();
 		adapter = new CustomListAdapter(this, R.layout.messageitem, messages);

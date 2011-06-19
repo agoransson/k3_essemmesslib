@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class EssemmessExampleWrite extends Activity implements
 		EssemmessListener {
@@ -77,11 +78,19 @@ public class EssemmessExampleWrite extends Activity implements
 
 	@Override
 	public void essemmessWrite(EssemmessWriteEvent evt) {
-		Log.i("test2", TAG + " write event! ");
-		/* This, however, is a good thing to check in this activity */
-		Intent i = new Intent(EssemmessExampleWrite.this,
-				EssemmessExampleRead.class);
-		startActivity(i);
+		if (evt.getResult()) {
+
+			Toast.makeText(this, "Write success!", Toast.LENGTH_SHORT).show();
+
+			/* This, however, is a good thing to check in this activity */
+			Intent i = new Intent(EssemmessExampleWrite.this,
+					EssemmessExampleRead.class);
+			startActivity(i);
+		} else {
+
+			Toast.makeText(this, "Write didn't work...", Toast.LENGTH_SHORT)
+					.show();
+		}
 	}
 
 	@Override

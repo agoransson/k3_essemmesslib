@@ -23,8 +23,6 @@ package se.mah.k3.goransson.andreas.essemmesslib;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.EventObject;
-
 /**
  * 
  * @author Andreas Göransson, andreas.goransson@mah.se
@@ -32,19 +30,28 @@ import java.util.EventObject;
  */
 public class EssemmessRegisterEvent extends EssemmessEvent {
 
-	private String returnmessage;
+	private boolean result = false;
 
-	public EssemmessRegisterEvent(Essemmess source, String returnmessage) {
-		super(source, EssemmessEvent.REGISTER);
-		this.returnmessage = returnmessage;
+	/**
+	 * Constructor.
+	 * 
+	 * @param source
+	 * @param message
+	 * @param result
+	 */
+	public EssemmessRegisterEvent(Essemmess source, String message,
+			boolean result) {
+		super(source, EssemmessEvent.REGISTER, message);
+		this.result = result;
 	}
 
 	/**
-	 * Get the status of the REGISTER attempt.
+	 * Returns true or false, depending on the result of the registration.
 	 * 
 	 * @return
 	 */
-	public String getMessage() {
-		return returnmessage;
+	public boolean getResult() {
+		return result;
 	}
+
 }
