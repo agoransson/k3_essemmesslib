@@ -21,10 +21,9 @@ Supported functionality:
 * Write new message (this requires a successful login)
 * Read messages, based on tag (requires a successful login)
 * Read messages, all (requires a successful login)
-
+* Register new user, with avatar!
 
 TODO:
-* Register new user
 * Remove the listener interface, replace with Handler
 
 
@@ -32,3 +31,5 @@ Example app, functionality:
 To get the android example app up and running click "File" -> "Import" -> "General" -> "Existing Projects into Workspace".
 * Login
 * Write
+* Read
+* Register
