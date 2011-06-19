@@ -30,12 +30,12 @@ import java.util.EventObject;
  * @author Andreas Göransson, andreas.goransson@mah.se
  * 
  */
-public class EssemmessWriteEvent extends EventObject {
+public class EssemmessWriteEvent extends EssemmessEvent {
 
 	private String returnmessage;
 
 	public EssemmessWriteEvent(Essemmess source, String returnmessage) {
-		super(source);
+		super(source, EssemmessEvent.WRITE);
 		this.returnmessage = returnmessage;
 	}
 

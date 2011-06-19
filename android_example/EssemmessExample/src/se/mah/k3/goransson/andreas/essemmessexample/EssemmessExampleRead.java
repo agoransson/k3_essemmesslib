@@ -1,5 +1,7 @@
 package se.mah.k3.goransson.andreas.essemmessexample;
 
+import java.util.ArrayList;
+
 import se.mah.k3.goransson.andreas.essemmesslib.Essemmess;
 import se.mah.k3.goransson.andreas.essemmesslib.EssemmessHelper;
 import se.mah.k3.goransson.andreas.essemmesslib.EssemmessListener;
@@ -7,48 +9,53 @@ import se.mah.k3.goransson.andreas.essemmesslib.EssemmessLoginEvent;
 import se.mah.k3.goransson.andreas.essemmesslib.EssemmessReadEvent;
 import se.mah.k3.goransson.andreas.essemmesslib.EssemmessRegisterEvent;
 import se.mah.k3.goransson.andreas.essemmesslib.EssemmessWriteEvent;
+import se.mah.k3.goransson.andreas.essemmesslib.Post;
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 
-public class EssemmessExampleWrite extends Activity implements
-		EssemmessListener {
+public class EssemmessExampleRead extends Activity implements EssemmessListener {
 
-	private static final String TAG = "EssemmessExampleWrite";
+	private static final String TAG = "EssemmessExampleRead";
+	/* UI */
+	/* Header (filter) */
+	private EditText filtertext;
+	private Button filterbutton;
+	/* Content (list) */
+	private ListView list;
+	private ArrayList<Post> messages;
+	private CustomListAdapter adapter;
 
-	/* Essemmess instance */
 	private Essemmess mServer;
 
-	/* UI */
-	private EditText tag;
-	private EditText message;
-
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.write);
+		setContentView(R.layout.read);
 
-		/* get the server instance */
+		/* Connect the server to this activity */
 		mServer = EssemmessHelper.getServer(this);
 
 		/* UI */
-		tag = (EditText) findViewById(R.id.text_tag);
-		message = (EditText) findViewById(R.id.text_message);
-
-		Button write = (Button) findViewById(R.id.button_write);
-		write.setOnClickListener(new OnClickListener() {
-
+		/* Header (filter UI ) */
+		filtertext = (EditText) findViewById(R.id.read_filter);
+		filterbutton = (Button) findViewById(R.id.read_update);
+		filterbutton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mServer.write(message.getText().toString(), tag.getText()
-						.toString());
+				mServer.read(filtertext.getText().toString());
 			}
 		});
+		/* Content (list) */
+		list = (ListView) findViewById(R.id.read_messages);
+		messages = new ArrayList<Post>();
+		adapter = new CustomListAdapter(this, R.layout.messageitem, messages);
+		list.setAdapter(adapter);
 	}
 
 	@Override
@@ -69,6 +76,22 @@ public class EssemmessExampleWrite extends Activity implements
 
 	@Override
 	public void essemmessRead(EssemmessReadEvent evt) {
+		/* If server returns messages, it'll be in here */
+		// Log.i("test", "getting messages..." + evt.getPosts().size());
+
+		/* Clear the messages */
+		messages.clear();
+
+		/* Get all new messages */
+		ArrayList<Post> posts = evt.getPosts();
+		for (Post p : posts) {
+			messages.add(p);
+		}
+
+		Log.i("test2", "antal msg: " + posts.size());
+
+		/* Update the listview */
+		adapter.notifyDataSetChanged();
 	}
 
 	@Override
@@ -77,15 +100,9 @@ public class EssemmessExampleWrite extends Activity implements
 
 	@Override
 	public void essemmessWrite(EssemmessWriteEvent evt) {
-		Log.i("test2", TAG + " write event! ");
-		/* This, however, is a good thing to check in this activity */
-		Intent i = new Intent(EssemmessExampleWrite.this,
-				EssemmessExampleRead.class);
-		startActivity(i);
 	}
 
 	@Override
 	public void essemmessRegister(EssemmessRegisterEvent evt) {
 	}
-
 }

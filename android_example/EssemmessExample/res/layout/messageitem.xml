@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" 
+	android:layout_height="fill_parent"
+	android:padding="5dp" android:layout_marginBottom="2dp">
+	<ImageView android:src="@drawable/icon" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignParentLeft="true" android:id="@+id/messageitem_avatar"></ImageView>
+	<LinearLayout android:orientation="vertical" android:layout_height="wrap_content" android:id="@+id/messageitem_text" android:layout_width="fill_parent">
+		<TextView android:text="TextView" android:id="@+id/messageitem_author" android:layout_height="wrap_content" android:layout_width="fill_parent"></TextView>
+		<TextView android:text="TextView" android:id="@+id/messageitem_message" android:layout_height="wrap_content" android:layout_width="fill_parent" android:textColor="#fff"></TextView>
+		<TextView android:text="TextView" android:id="@+id/messageitem_tag" android:layout_height="wrap_content" android:layout_width="fill_parent"></TextView>
+	</LinearLayout>
+</LinearLayout>

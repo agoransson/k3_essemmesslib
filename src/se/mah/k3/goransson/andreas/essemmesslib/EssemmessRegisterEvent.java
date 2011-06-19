@@ -1,7 +1,7 @@
 package se.mah.k3.goransson.andreas.essemmesslib;
 
 /*
- * EssemmessLoginEvent.java
+ * EssemmessRegisterEvent.java
  * 
  * Connects to, and interacts with, the messaging-system set up at 
  * Malmö University. This library is part of the Android specific mobile 
@@ -26,25 +26,25 @@ package se.mah.k3.goransson.andreas.essemmesslib;
 import java.util.EventObject;
 
 /**
- * This is the login event object.
  * 
  * @author Andreas Göransson, andreas.goransson@mah.se
+ * 
  */
-public class EssemmessLoginEvent extends EssemmessEvent {
-	private Boolean loggedin;
+public class EssemmessRegisterEvent extends EssemmessEvent {
 
-	public EssemmessLoginEvent(Essemmess source, Boolean logedin) {
-		super(source, EssemmessEvent.LOGIN);
-		this.loggedin = logedin;
+	private String returnmessage;
+
+	public EssemmessRegisterEvent(Essemmess source, String returnmessage) {
+		super(source, EssemmessEvent.REGISTER);
+		this.returnmessage = returnmessage;
 	}
 
 	/**
-	 * Get the status of the login attempt.
+	 * Get the status of the REGISTER attempt.
 	 * 
 	 * @return
 	 */
-	public Boolean getLoggedin() {
-		return loggedin;
+	public String getMessage() {
+		return returnmessage;
 	}
-
 }

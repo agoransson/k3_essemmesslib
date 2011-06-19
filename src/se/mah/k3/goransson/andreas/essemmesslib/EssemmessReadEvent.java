@@ -31,12 +31,12 @@ import java.util.EventObject;
  * @author Andreas Göransson, andreas.goransson@mah.se
  * 
  */
-public class EssemmessReadEvent extends EventObject {
+public class EssemmessReadEvent extends EssemmessEvent {
 
 	private ArrayList<Post> posts;
 
 	public EssemmessReadEvent(Essemmess source, ArrayList<Post> posts) {
-		super(source);
+		super(source, EssemmessEvent.READ);
 
 		this.posts = posts;
 	}

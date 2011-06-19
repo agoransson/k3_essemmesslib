@@ -32,6 +32,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>k3_essemmesslib_src</name>
+			<type>2</type>
+			<locationURI>_android_k3_essemmesslib_ac1f69b7/src</locationURI>
+		</link>
+		<link>
 			<name>pfi3_essemmesslib_src</name>
 			<type>2</type>
 			<locationURI>_android_pfi3_essemmesslib_22d81c7f/src</locationURI>

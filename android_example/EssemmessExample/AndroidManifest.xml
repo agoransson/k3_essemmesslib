@@ -16,6 +16,8 @@
             </intent-filter>
         </activity>
         <activity android:name="EssemmessExampleWrite"></activity>
+        <activity android:theme="@android:style/Theme.Dialog" android:name="EssemmessExampleRegister"></activity>
+        <activity android:name="EssemmessExampleRead"></activity>
 
     </application>
 </manifest>
