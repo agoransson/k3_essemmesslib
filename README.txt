@@ -26,7 +26,7 @@ Supported functionality:
 
 TODO:
 * Remove the listener interface, replace with Handler
-
+* Fix the MySQL queries, they're probably not very efficient right now
 
 Example app, functionality:
 To get the android example app up and running click "File" -> "Import" -> "General" -> "Existing Projects into Workspace".
