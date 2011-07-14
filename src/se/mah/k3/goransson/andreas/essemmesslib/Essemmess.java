@@ -76,8 +76,8 @@ public class Essemmess {
 
 	/**
 	 * Create a new Essemmess instance, pass the current foreground context
-	 * otherwise the app might crash. Do not use "getApplicationContext()" if
-	 * you can avoid it.
+	 * otherwise the app might crash. Do not use "getApplicationContext()" if you
+	 * can avoid it.
 	 * 
 	 * @param ctx
 	 */
@@ -89,9 +89,9 @@ public class Essemmess {
 	}
 
 	/**
-	 * Sets the current context of the Essemmess server, should be used if you
-	 * use the same server instance in multiple activies. Otherwise the
-	 * application will probably crash.
+	 * Sets the current context of the Essemmess server, should be used if you use
+	 * the same server instance in multiple activies. Otherwise the application
+	 * will probably crash.
 	 * 
 	 * @param ctx
 	 */
@@ -128,11 +128,10 @@ public class Essemmess {
 				/* Get the image as string */
 				ByteArrayOutputStream stream = new ByteArrayOutputStream();
 				/* We want to keep a standard size for all avatars, 72x72px */
-				getScaledBitmap(avatar, 72).compress(
-						Bitmap.CompressFormat.JPEG, 75, stream);
+				getScaledBitmap(avatar, 72).compress(Bitmap.CompressFormat.JPEG, 75,
+						stream);
 				byte[] byte_arr = stream.toByteArray();
-				String image_str = Base64.encodeToString(byte_arr,
-						Base64.DEFAULT);
+				String image_str = Base64.encodeToString(byte_arr, Base64.DEFAULT);
 
 				/* Execute the HttpWorker as REGISTER with the parameters */
 				new HttpWorker(this.ctx, HttpWorker.REGISTER).execute(username,
@@ -151,11 +150,9 @@ public class Essemmess {
 	 * @param password
 	 */
 	public void login(String username, String password) {
-		if (mConnectivityManager.getActiveNetworkInfo()
-				.isConnectedOrConnecting()) {
+		if (mConnectivityManager.getActiveNetworkInfo().isConnectedOrConnecting()) {
 			/* Execute the HttpWorker as LOGIN with the parameters */
-			new HttpWorker(this.ctx, HttpWorker.LOGIN).execute(username,
-					password);
+			new HttpWorker(this.ctx, HttpWorker.LOGIN).execute(username, password);
 		} else {
 			/* Toast "not connected" */
 			Toast.makeText(ctx,
@@ -171,11 +168,10 @@ public class Essemmess {
 	 * @param tag
 	 */
 	public void write(String message, String tag) {
-		if (mConnectivityManager.getActiveNetworkInfo()
-				.isConnectedOrConnecting()) {
+		if (mConnectivityManager.getActiveNetworkInfo().isConnectedOrConnecting()) {
 			/* Execute the HttpWorker as POST with the parameters */
-			new HttpWorker(this.ctx, HttpWorker.WRITE).execute(access_token,
-					message, tag);
+			new HttpWorker(this.ctx, HttpWorker.WRITE).execute(access_token, message,
+					tag);
 		} else {
 			/* Toast "not connected" */
 			Toast.makeText(ctx,
@@ -189,8 +185,7 @@ public class Essemmess {
 	 * application is destroyed.
 	 */
 	public void logout() {
-		if (mConnectivityManager.getActiveNetworkInfo()
-				.isConnectedOrConnecting()) {
+		if (mConnectivityManager.getActiveNetworkInfo().isConnectedOrConnecting()) {
 			/* Execute the HttpWorker as LOGOUT with the parameters */
 			new HttpWorker(this.ctx, HttpWorker.LOGOUT).execute(access_token);
 		} else {
@@ -207,15 +202,13 @@ public class Essemmess {
 	 * @param filter_tag
 	 */
 	public void read(String filter_tag) {
-		if (mConnectivityManager.getActiveNetworkInfo()
-				.isConnectedOrConnecting()) {
+		if (mConnectivityManager.getActiveNetworkInfo().isConnectedOrConnecting()) {
 			/* Execute the HttpWorker as READ with the parameters */
 			new HttpWorker(this.ctx, HttpWorker.READ).execute(access_token,
 					filter_tag);
 		} else {
 			/* Toast "not connected" */
-			Toast.makeText(
-					ctx,
+			Toast.makeText(ctx,
 					"No internet connection found when reading messages on server.",
 					Toast.LENGTH_SHORT).show();
 		}
@@ -240,25 +233,25 @@ public class Essemmess {
 		matrix.postScale(scale_w, scale_h);
 
 		/* Get the new bitmap */
-		Bitmap resized = Bitmap.createBitmap(bmp, 0, 0, width, height, matrix,
-				true);
+		Bitmap resized = Bitmap
+				.createBitmap(bmp, 0, 0, width, height, matrix, true);
 
 		return resized;
 	}
 
 	/**
-	 * Generic Worker, used to connect to, and read responses from, the
-	 * Essemmess server.
+	 * Generic Worker, used to connect to, and read responses from, the Essemmess
+	 * server.
 	 * 
 	 * @author Andreas Göransson, andreas.goransson@mah.se
 	 */
-	private class HttpWorker extends AsyncTask<String, Void, Void> {
+	private class HttpWorker extends AsyncTask<String, Void, String> {
 
 		/* TAG */
 		private static final String TAG = "HttpWorker";
 
 		/* Location of the server scripts */
-		private static final String SERVER = "http://195.178.232.26:8080/pfi3_2011/";
+		private static final String SERVER = "http://195.178.232.26/essemmess/";
 
 		/* Action constants */
 		public static final int LOGIN = 10;
@@ -269,9 +262,6 @@ public class Essemmess {
 
 		/* Selected action */
 		private int action;
-
-		/* The JSON response */
-		private String response;
 
 		/* The progress dialog, used while waiting for http POST */
 		private ProgressDialog mProgressDialog;
@@ -296,7 +286,7 @@ public class Essemmess {
 		}
 
 		@Override
-		protected Void doInBackground(String... params) {
+		protected String doInBackground(String... params) {
 
 			/* Server url */
 			String url = null;
@@ -319,8 +309,7 @@ public class Essemmess {
 				url = SERVER + "post.php";
 
 				/* Parameters... */
-				arguments
-						.add(new BasicNameValuePair("access_token", params[0]));
+				arguments.add(new BasicNameValuePair("access_token", params[0]));
 				arguments.add(new BasicNameValuePair("message", params[1]));
 				arguments.add(new BasicNameValuePair("tag", params[2]));
 				break;
@@ -329,8 +318,7 @@ public class Essemmess {
 				url = SERVER + "read.php";
 
 				/* Parameters */
-				arguments
-						.add(new BasicNameValuePair("access_token", params[0]));
+				arguments.add(new BasicNameValuePair("access_token", params[0]));
 				arguments.add(new BasicNameValuePair("filter_tag", params[1]));
 				break;
 			case LOGOUT:
@@ -338,8 +326,7 @@ public class Essemmess {
 				url = SERVER + "logout.php";
 
 				/* Parameters... */
-				arguments
-						.add(new BasicNameValuePair("access_token", params[0]));
+				arguments.add(new BasicNameValuePair("access_token", params[0]));
 				break;
 			case REGISTER:
 				/* Set the url */
@@ -354,18 +341,21 @@ public class Essemmess {
 			}
 
 			/* Fire the http post and store the response */
-			response = httppost(url, arguments);
+			String response = httppost(url, arguments);
 
-			if (DEBUG)
-				Log.i("test", response);
-
-			return null;
+			return response;
 		}
 
 		@Override
-		protected void onPostExecute(Void result) {
+		protected void onPostExecute(String response) {
+			if (DEBUG)
+				Log.i(TAG, response);
+
 			/* Make sure the http response has some content */
 			if (response != null || response.length() > 0) {
+
+				Log.i(TAG, "response Ok, kör post exec med action: " + action);
+				
 				/* Parse the JSON msg */
 				try {
 					JSONObject json_data = new JSONObject(response);
@@ -385,9 +375,8 @@ public class Essemmess {
 						data = json_data.getString("data");
 
 						/* Dispatch the login event */
-						dispatchEssemmessEvent(new EssemmessLoginEvent(
-								Essemmess.this, message,
-								Boolean.parseBoolean(data)));
+						dispatchEssemmessEvent(new EssemmessLoginEvent(Essemmess.this,
+								message, Boolean.parseBoolean(data)));
 
 						break;
 					case LOGOUT:
@@ -395,8 +384,8 @@ public class Essemmess {
 						access_token = "";
 
 						/* Dispatch the logout event (there's no data in it...) */
-						dispatchEssemmessEvent(new EssemmessLogoutEvent(
-								Essemmess.this, message));
+						dispatchEssemmessEvent(new EssemmessLogoutEvent(Essemmess.this,
+								message));
 						break;
 					case WRITE:
 						/* Get the result */
@@ -404,11 +393,11 @@ public class Essemmess {
 
 						/* Dispatch the write event */
 						if (Boolean.parseBoolean(data))
-							dispatchEssemmessEvent(new EssemmessWriteEvent(
-									Essemmess.this, message, true));
+							dispatchEssemmessEvent(new EssemmessWriteEvent(Essemmess.this,
+									message, true));
 						else
-							dispatchEssemmessEvent(new EssemmessWriteEvent(
-									Essemmess.this, message, false));
+							dispatchEssemmessEvent(new EssemmessWriteEvent(Essemmess.this,
+									message, false));
 
 						break;
 					case READ:
@@ -416,38 +405,39 @@ public class Essemmess {
 						ArrayList<Post> posts = new ArrayList<Post>();
 
 						/* First test if the read failed! */
+						// The issue here is that this WILL return false if the data was OK...this needs to be fixed!
 						if (!Boolean.parseBoolean(json_data.getString("data"))) {
 							/* Dispatch the event with arraylist */
-							dispatchEssemmessEvent(new EssemmessReadEvent(
-									Essemmess.this, message, posts));
-							break;
+//							dispatchEssemmessEvent(new EssemmessReadEvent(Essemmess.this,
+//									message, posts));
+//							break;
 						}
 
 						JSONArray json_array = json_data.getJSONArray("data");
 						for (int i = 0; i < json_array.length(); ++i) {
 							JSONObject json_post = json_array.getJSONObject(i);
 
-							JSONObject json_user = json_post
-									.getJSONObject("user");
+							JSONObject json_user = json_post.getJSONObject("user");
 							/* Decode the bitmap */
-							byte[] raw_image = Base64.decode(
-									json_user.getString("avatar"),
+							byte[] raw_image = Base64.decode(json_user.getString("avatar"),
 									Base64.DEFAULT);
-							Bitmap avatar = BitmapFactory.decodeByteArray(
-									raw_image, 0, raw_image.length);
+							Bitmap avatar = BitmapFactory.decodeByteArray(raw_image, 0,
+									raw_image.length);
 
 							/* Create the user */
 							User u = new User(json_user.getString("username"),
 									json_user.getString("email"), avatar);
 
 							/* Add the post to the list */
-							posts.add(new Post(json_post.getString("tag"), u,
-									json_post.getString("message")));
+							posts.add(new Post(json_post.getString("tag"), u, json_post
+									.getString("message")));
 						}
 
+						Log.i("test","post size, inside lib: " + posts.size());
+						
 						/* Dispatch the event with arraylist */
-						dispatchEssemmessEvent(new EssemmessReadEvent(
-								Essemmess.this, message, posts));
+						dispatchEssemmessEvent(new EssemmessReadEvent(Essemmess.this,
+								message, posts));
 						break;
 					case REGISTER:
 						/* Get the result */
@@ -455,11 +445,11 @@ public class Essemmess {
 
 						/* Dispatch the register event */
 						if (Boolean.parseBoolean(data)) {
-							dispatchEssemmessEvent(new EssemmessRegisterEvent(
-									Essemmess.this, message, true));
+							dispatchEssemmessEvent(new EssemmessRegisterEvent(Essemmess.this,
+									message, true));
 						} else {
-							dispatchEssemmessEvent(new EssemmessRegisterEvent(
-									Essemmess.this, message, false));
+							dispatchEssemmessEvent(new EssemmessRegisterEvent(Essemmess.this,
+									message, false));
 						}
 						break;
 					}
@@ -474,17 +464,17 @@ public class Essemmess {
 
 			} else {
 				/* HTTP Post failed... */
-				Toast.makeText(ctx,
-						"Connection to server failed, please try again.",
+				Toast.makeText(ctx, "Connection to server failed, please try again.",
 						Toast.LENGTH_SHORT).show();
 
 			}
-			super.onPostExecute(result);
+			
+			super.onPostExecute(response);
 		}
 
 		/**
-		 * Executes a httppost to a server instance with the given POST
-		 * arguments and returns a String response from the server.
+		 * Executes a httppost to a server instance with the given POST arguments
+		 * and returns a String response from the server.
 		 */
 		private String httppost(String url, ArrayList<NameValuePair> args) {
 			InputStream is = null;
@@ -508,8 +498,8 @@ public class Essemmess {
 			/* Read from server */
 			try {
 				/* Read the response stream */
-				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(is, "iso-8859-1"), 8);
+				BufferedReader reader = new BufferedReader(new InputStreamReader(is,
+						"iso-8859-1"), 8);
 
 				/* Copy the response to String */
 				StringBuilder sb = new StringBuilder();
@@ -554,8 +544,8 @@ public class Essemmess {
 	}
 
 	/**
-	 * Dispatches a new PUBLISH event, this is dispatched when the HttpWorker
-	 * has executed a PUBLISH action on the Essemmess server.
+	 * Dispatches a new PUBLISH event, this is dispatched when the HttpWorker has
+	 * executed a PUBLISH action on the Essemmess server.
 	 * 
 	 * @param evt
 	 */
