@@ -35,7 +35,7 @@ include_once("config.php");
 	<section id="content">
 		<?php
 			// list all messages (there's no filtering implemented at this point)
-			$query  = "SELECT tags.tag, messages.message, users.username, messages.time";
+			$query  = "SELECT tags.tag, messages.message, users.username, users.email, messages.time";
 			$query .= " FROM messages";
 			$query .= " JOIN tags ON (messages.tag_id = tags.idtags)";
 			$query .= " JOIN users ON (messages.user_id = users.idusers)";

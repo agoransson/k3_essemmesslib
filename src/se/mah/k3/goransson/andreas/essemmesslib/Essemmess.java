@@ -430,7 +430,7 @@ public class Essemmess {
 
 							/* Add the post to the list */
 							posts.add(new Post(json_post.getString("tag"), u, json_post
-									.getString("message")));
+									.getString("message"), json_post.getString("time")));
 						}
 
 						Log.i("test","post size, inside lib: " + posts.size());

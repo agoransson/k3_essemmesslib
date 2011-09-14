@@ -33,12 +33,14 @@ public class Post {
 	public User user;
 	public String tag;
 	public String message;
+	public String time;
 
-	public Post(String tag, User user, String message) {
+	public Post(String tag, User user, String message, String time) {
 		super();
 		this.tag = tag;
 		this.user = user;
 		this.message = message;
+		this.time = time;
 	}
 
 	public String getTag() {
@@ -51,6 +53,10 @@ public class Post {
 
 	public String getMessage() {
 		return message;
+	}
+	
+	public String getTime(){
+		return time;
 	}
 
 	/**

@@ -48,123 +48,49 @@ if (mysql_num_rows($find_result) == 1) {
     /* Find tag_id */
     if (strlen($filter_tag) > 0) {
         /* This means we have entered something in the filter_field... */
-
-        $find_tag_id = "SELECT idtags FROM tags WHERE tag='$filter_tag'";
-        if (!($find_tag_id_result = mysql_query($find_tag_id, $link))) {
+		$query  = "SELECT tags.tag, messages.message, users.username, messages.time, avatars.img_data";
+		$query .= " FROM messages";
+		$query .= " JOIN tags ON (messages.tag_id = tags.idtags)";
+		$query .= " JOIN users ON (messages.user_id = users.idusers)";
+		$query .= " JOIN avatars ON (users.id_avatar = avatars.idavatars)";
+		$query .= " WHERE (tags.tag = '$filter_tag')";
+		
+		if (!($result = mysql_query($query, $link))) {
             /* Failed */
             $response["message"] = mysql_error();
             $response["data"] = "false";
             die(json_encode($response));
         }
 
-        if (mysql_num_rows($find_tag_id_result) == 1) {
-            /* Locate the unique tag */
-            $tag_row = mysql_fetch_array($find_tag_id_result);
-            $tag_id = $tag_row[0];
-        } else {
-            /* No tags... kill it? */
-            $response["message"] = "Found no matching tags.";
-            $response["data"] = "false";
-            die(json_encode($response));
-        }
-
-        /* Find messages with tag_id */
-        $find_messages = "SELECT * FROM messages WHERE tag_id='$tag_id'";
-        if (!($find_messages_result = mysql_query($find_messages, $link))) {
-            /* Failed */
-            $response["message"] = mysql_error();
-            $response["data"] = "false";
-            die(json_encode($response));
-        }
-
-        /* Read the selected rows into an array */
-        while ($row = mysql_fetch_assoc($find_messages_result)) {
-            /* Get the username */
-            $user_id = $row["user_id"];
-            $get_user = "SELECT username, email, id_avatar FROM users WHERE idusers='$user_id'";
-            if (!($get_user_result = mysql_query($get_user, $link))) {
-                /* Error */
-                $response["message"] = mysql_error();
-                $response["data"] = "false";
-                die(json_encode($response));
-            }
-            $user_row = mysql_fetch_assoc($get_user_result);
-            /* Get the tagname */
-            $tag_id = $row["tag_id"];
-            $get_tag = "SELECT tag FROM tags WHERE idtags='$tag_id'";
-            if (!($get_tag_result = mysql_query($get_tag, $link))) {
-                /* Error */
-                $response["message"] = mysql_error();
-                $response["data"] = "false";
-                die(json_encode($response));
-            }
-            $tag_row = mysql_fetch_assoc($get_tag_result);
-            /* Get the avatar */
-            $id_avatar = $user_row["id_avatar"];
-            $get_avatar = "SELECT img_data FROM avatars WHERE idavatars='$id_avatar'";
-            if (!($get_avatar_result = mysql_query($get_avatar, $link))) {
-                /* Error */
-                $response["message"] = mysql_error();
-                $response["data"] = "false";
-                die(json_encode($response));
-            }
-            $avatar = mysql_result($get_avatar_result, 0);
+		while( $row = mysql_fetch_row($result) ){
+			// tag = 0, message = 1, authorname = 2, email = 3, avatar = 4
             /* Make the user obj */
-            $user = array("username" => $user_row["username"], "email" => $user_row["email"], "avatar" => $avatar);
+            $user = array("username" => $row[2], "email" => $row[3], "avatar" => $row[4]);
             /* user_id, tag_id, message */
-            $response["data"][] = array("user" => $user, "tag" => $tag_row["tag"], "message" => $row["message"]);
-        }
+            $response["data"][] = array("user" => $user, "tag" => $row[0], "message" => $row[1]);
+		}
     } else {
-        /* Or if we didn't enter anything, select all messages */
-
-        /* Find messages with tag_id */
-        $find_messages = "SELECT * FROM messages";
-        if (!($find_messages_result = mysql_query($find_messages, $link))) {
+		/* This means we left the filter field empty, get all messages! */
+		$query  = "SELECT tags.tag, messages.message, users.username, users.email, avatars.img_data, messages.time";
+		$query .= " FROM messages";
+		$query .= " JOIN tags ON (messages.tag_id = tags.idtags)";
+		$query .= " JOIN users ON (messages.user_id = users.idusers)";
+		$query .= " JOIN avatars ON (users.id_avatar = avatars.idavatars)";
+		
+		if (!($result = mysql_query($query, $link))) {
             /* Failed */
             $response["message"] = mysql_error();
             $response["data"] = "false";
             die(json_encode($response));
         }
 
-        /* Read the selected rows into an array */
-        while ($row = mysql_fetch_assoc($find_messages_result)) {
-            /* Get the username */
-            $user_id = $row["user_id"];
-            $get_username = "SELECT username, email, id_avatar FROM users WHERE idusers='$user_id'";
-            if (!($get_username_result = mysql_query($get_username, $link))) {
-                /* Error */
-                $response["message"] = mysql_error();
-                $response["data"] = "false";
-                die(json_encode($response));
-            }
-            $user_row = mysql_fetch_assoc($get_username_result);
-            /* Get the tagname */
-            $tag_id = $row["tag_id"];
-            $get_tag = "SELECT tag FROM tags WHERE idtags='$tag_id'";
-            if (!($get_tag_result = mysql_query($get_tag, $link))) {
-                /* Error */
-                $response["message"] = mysql_error();
-                $response["data"] = "false";
-                die(json_encode($response));
-            }
-            $tag_row = mysql_fetch_assoc($get_tag_result);
-            /* Get the avatar */
-            $id_avatar = $user_row["id_avatar"];
-            $get_avatar = "SELECT img_data FROM avatars WHERE idavatars='$id_avatar'";
-            if (!($get_avatar_result = mysql_query($get_avatar, $link))) {
-                /* Error */
-                $response["message"] = mysql_error();
-                $response["data"] = "false";
-                die(json_encode($response));
-            }
-            $avatar = mysql_result($get_avatar_result, 0);
+		while( $row = mysql_fetch_row($result) ){
+			// tag = 0, message = 1, authorname = 2, email = 3, avatar = 4
             /* Make the user obj */
-            $user = array("username" => $user_row["username"], "email" => $user_row["email"], "avatar" => $avatar);
-            /* Add the post to the response */
-            // $response["posts"][] = array( "user" => $user_row["username"], "tag" => $tag_row["tag"], "message" => $row["message"] );
-            $response["message"] = "User " . $user_row["username"] . " successfully authenticated and read messages by tag " . $tag_row["tag"];
-            $response["data"][] = array("user" => $user, "tag" => $tag_row["tag"], "message" => $row["message"]);
-        }
+            $user = array("username" => $row[2], "email" => $row[3], "avatar" => $row[4]);
+            /* user_id, tag_id, message */
+            $response["data"][] = array("user" => $user, "tag" => $row[0], "message" => $row[1], "time" => $row[5]);
+		}
     }
 } else {
     /* This means there was no access token in the database that matched the token supplied */
