@@ -76,9 +76,6 @@ public class EssemmessExampleRead extends Activity implements EssemmessListener 
 
 	@Override
 	public void essemmessRead(EssemmessReadEvent evt) {
-		/* If server returns messages, it'll be in here */
-		// Log.i("test", "getting messages..." + evt.getPosts().size());
-
 		/* Clear the messages */
 		messages.clear();
 
@@ -87,8 +84,6 @@ public class EssemmessExampleRead extends Activity implements EssemmessListener 
 		for (Post p : posts) {
 			messages.add(p);
 		}
-
-		Log.i("test2", "antal msg: " + posts.size());
 
 		/* Update the listview */
 		adapter.notifyDataSetChanged();
