@@ -13,7 +13,7 @@
 
 include_once("config.php");
 
-	/* We're not going to filter this place right now... just display everything */
+/* We're not going to filter this place right now... just display everything */
 ?>
 
 
