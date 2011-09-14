@@ -85,7 +85,7 @@ if (mysql_num_rows($find_result) == 1) {
         }
 
 		while( $row = mysql_fetch_row($result) ){
-			// tag = 0, message = 1, authorname = 2, email = 3, avatar = 4
+			// tag = 0, message = 1, authorname = 2, email = 3, avatar = 4, time = 5
             /* Make the user obj */
             $user = array("username" => $row[2], "email" => $row[3], "avatar" => $row[4]);
             /* user_id, tag_id, message */

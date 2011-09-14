@@ -54,8 +54,8 @@ public class Post {
 	public String getMessage() {
 		return message;
 	}
-	
-	public String getTime(){
+
+	public String getTime() {
 		return time;
 	}
 
@@ -64,6 +64,7 @@ public class Post {
 	 * information. User, Tag, and Message.
 	 */
 	public String toString() {
-		return "User: " + user.toString() + "  Tag: " + tag + "  Message: " + message;
+		return "User: " + user.toString() + "  Tag: " + tag + "  Message: "
+				+ message + "  Time: " + time;
 	}
 }
