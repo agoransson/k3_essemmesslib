@@ -1,14 +1,14 @@
 <?php
 
 /********************************************************\
- * File: 	index.php				*
- * Author: 	Andreas Göransson			*
- * Date: 	2011-03-16				*
- * Organization: Malmö University, K3			*
- *							*
+ * File: 	index.php									*
+ * Author: 	Andreas Göransson							*
+ * Date: 	2011-09-13									*
+ * Organization: Malmö University, K3					*
+ *														*
  * Project: 	Programming for Interaction 3 - Mobile	*
- *							*
- * Description:	Lists messages on the system. 		*
+ *														*
+ * Description:	Lists messages on the system. 			*
 \********************************************************/
 
 include_once("config.php");
@@ -16,57 +16,45 @@ include_once("config.php");
 	/* We're not going to filter this place right now... just display everything */
 ?>
 
-<!-- THE HTML Part -->
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-   "http://www.w3.org/TR/html4/strict.dtd">
-
+<!doctype html>
 <html>
 
 <head>
-	<title>Essemmess AB - (PFI3: Mobile)</title>
+	<meta charset="utf-8">
 	
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>Essemmess AB - (MAH Android course)</title>
+
+	<meta name="description" content="Essemmess AB">
+	<meta name="author" content="Andreas Göransson">
 	
-	<!--link rel="stylesheet" type="text/css" href="style.css"-->
-	<!--script type="text/javascript" src="script.js"></script-->
+	<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-	<!-- List all messages, do this in a table -->
-	<table border="1" summary="This table shows all enteres messags in Essemmess database">
-	<caption>Ess emm ess AB</caption>
-	<tr> <th>Message ID</th> <th>User ID</th> <th>TAG</th> <th>Message</th> </tr>
+	<section id="content">
 		<?php
-			$sqlresult = mysql_query("SELECT * FROM messages");
+			// list all messages (there's no filtering implemented at this point)
+			$query  = "SELECT tags.tag, messages.message, users.username, messages.time";
+			$query .= " FROM messages";
+			$query .= " JOIN tags ON (messages.tag_id = tags.idtags)";
+			$query .= " JOIN users ON (messages.user_id = users.idusers)";
 			
-			if ( !$sqlresult ) {
-				die( "Could not load messages " + sql_error() );
+			$result = mysql_query( $query );
+			if( !$result ){
+				die( "Could not load messages " . sql_error() );
 			}
-			
-			
 
-			while( $row = mysql_fetch_row($sqlresult) ) {
-
-				/* Get the tag as well */
-				$tagresult = mysql_query( "SELECT * FROM tags WHERE idtags='$row[2]'");
-				if( !$tagresult ){
-					die( "Could not load tag " + sql_error() );
-				}
-
-				$tag_num = mysql_num_rows( $tagresult );
-				if( $tag_num > 1 ){
-					die( "Something went wrong, we're having more than one tag for a unique ID! ");
-				}
-
-				/* If we made it here, the queries are fine... */
-				$tag = mysql_fetch_array( $tagresult );
-
-				/* Add the message to the table */
-				print "<tr> <td>".$row[0]."</td> <td>".$row[1]."</td> <td>".$tag[1]."</td> <td>".$row[3]."</td> </tr>";
+			while( $row = mysql_fetch_row($result) ){
+				print "<article><p class=\"tag\">".$row[0]."</p><p class=\"message\">".$row[1]."</p><p class=\"author\">written ".$row[3]." by ".$row[2]."</p></article>";
 			}
 		?>
-	</table>
+		<article class="push"></article>
+	</section>
+
+	<section id="footer">
+		<?php include("footer.php") ?>
+	</section>
 </body>
 
 </html>
